@@ -2,9 +2,11 @@
    combobox — выпадающий список с поиском и группами.
 
    Закрытое поле выглядит как прежний селект: рамка, значение
-   и квадратная «кнопка» со стрелкой справа.
+   и квадратная «кнопка» со стрелкой справа. Вместо поля может быть
+   своя кнопка (--button) — например, пустая ячейка армии.
    На ПК список раскрывается под полем (или над ним, если снизу
-   тесно — решает Combobox.tsx). На узком экране — на весь экран.
+   тесно). На узком экране — на весь экран. Где и как раскрыться,
+   решает Combobox.tsx в момент раскрытия — здесь только модификаторы.
    ============================================================ */
 
 .combobox {
@@ -29,7 +31,8 @@
 }
 
 /* раскрытое поле держит контур, пока фокус внутри списка */
-.combobox--open .combobox__trigger {
+.combobox--open .combobox__trigger,
+.combobox--open .combobox__button {
   outline: 2px solid var(--color-attacker);
   outline-offset: 2px;
 }
@@ -79,6 +82,20 @@
 .combobox__popup--up {
   top: auto;
   bottom: calc(100% + 6px);
+}
+
+/* Своя кнопка уже списка (ячейка армии — 98px): список не привязан к её
+   ширине — он шириной с поле «Шаблон» калькулятора. BUTTON_POPUP_WIDTH
+   в Combobox.tsx */
+.combobox--button .combobox__popup {
+  right: auto;
+  width: 340px;
+}
+
+/* вправо не помещается — растёт влево от правого края кнопки */
+.combobox--button .combobox__popup--end {
+  left: auto;
+  right: 0;
 }
 
 .combobox__head {
@@ -234,39 +251,42 @@
   color: var(--color-text-meta);
 }
 
-/* — Узкий экран: список на весь экран — */
-
 @media (max-width: 600px) {
   .combobox__trigger {
     font-size: 15px; /* как у подписей параметров на мобильных */
   }
+}
 
-  .combobox__popup,
-  .combobox__popup--up {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    max-height: none;
-    border: 0;
-    box-shadow: none;
-  }
+/* — На весь экран. Когда, решает Combobox.tsx: у поля «Шаблон» — на телефоне,
+     у ячеек армии — на всём узком экране, где армии идут лентой.
+     Двойной класс перебивает модификаторы размещения выше: --up, --end
+     и ширину у своей кнопки — */
 
-  .combobox__search {
-    height: 48px;
-    /* меньше 16px — и iOS увеличит страницу при фокусе в поле */
-    font-size: 16px;
-  }
+.combobox__popup.combobox__popup--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: auto;
+  max-height: none;
+  border: 0;
+  box-shadow: none;
+}
 
-  .combobox__close {
-    display: flex;
-  }
+.combobox__popup--fullscreen .combobox__search {
+  height: 48px;
+  /* меньше 16px — и iOS увеличит страницу при фокусе в поле */
+  font-size: 16px;
+}
 
-  .combobox__list {
-    --combobox-group-height: 32px;
-  }
+.combobox__popup--fullscreen .combobox__close {
+  display: flex;
+}
 
-  /* палец крупнее курсора */
-  .combobox__option {
-    min-height: 44px;
-  }
+.combobox__popup--fullscreen .combobox__list {
+  --combobox-group-height: 32px;
+}
+
+/* палец крупнее курсора */
+.combobox__popup--fullscreen .combobox__option {
+  min-height: 44px;
 }

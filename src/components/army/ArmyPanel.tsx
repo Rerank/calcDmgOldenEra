@@ -17,7 +17,10 @@ type Props = {
   stats: ArmyStats
   /** последнюю армию убрать нельзя — кнопки у неё нет */
   removable: boolean
+  /** ячейка только что добавленного отряда: фокус — в его количество; null — никуда */
+  focusSlot: number | null
   onRemove: () => void
+  onAddTroop: (slot: number, creatureId: string) => void
   onRemoveTroop: (slot: number) => void
   onCountChange: (slot: number, count: number) => void
 }
@@ -31,7 +34,9 @@ export function ArmyPanel({
   name,
   stats,
   removable,
+  focusSlot,
   onRemove,
+  onAddTroop,
   onRemoveTroop,
   onCountChange,
 }: Props) {
@@ -59,7 +64,10 @@ export function ArmyPanel({
         {army.slots.map((troop, slot) => (
           <ArmySlot
             key={slot}
+            id={`${army.id}-slot-${slot}`}
             troop={troop}
+            focusCount={slot === focusSlot}
+            onAdd={(creatureId) => onAddTroop(slot, creatureId)}
             onRemove={() => onRemoveTroop(slot)}
             onCountChange={(count) => onCountChange(slot, count)}
           />

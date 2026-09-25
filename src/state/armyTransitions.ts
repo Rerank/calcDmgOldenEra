@@ -98,9 +98,25 @@ export function removeArmy(armies: Army[], armyId: string): Army[] {
 }
 
 /**
- * Новый отряд. На ПК — в ячейку slot, если она пуста. На узком экране армия
- * сначала сжимается, и отряд встаёт в конец: slot там не важен. В полную
- * армию добавить нечего.
+ * В какую ячейку встанет новый отряд: на ПК — в ту, по которой кликнули,
+ * на узком экране — сразу за последним отрядом сжатой армии. −1 — ставить
+ * некуда: армия полна или ячейка занята. По этому номеру интерфейс
+ * находит новый отряд, чтобы поставить фокус в его количество.
+ */
+export function landingSlot(army: Army, slot: number, narrow: boolean): number {
+  if (narrow) {
+    const filled = army.slots.filter((troop) => troop !== null).length
+    return filled < ARMY_RULES.slots ? filled : -1
+  }
+
+  // занятая ячейка или номер за пределами армии
+  return army.slots[slot] === null ? slot : -1
+}
+
+/**
+ * Новый отряд — одно существо. На ПК — в ячейку slot, если она пуста.
+ * На узком экране армия сначала сжимается, и отряд встаёт в конец: slot
+ * там не важен. В полную армию добавить нечего.
  */
 export function addTroop(
   armies: Army[],
@@ -110,13 +126,10 @@ export function addTroop(
   narrow: boolean,
 ): Army[] {
   return updateArmy(armies, armyId, (army) => {
-    const slots = narrow ? compact(army.slots) : army.slots
-    const target = narrow ? slots.indexOf(null) : slot
+    const target = landingSlot(army, slot, narrow)
+    if (target < 0) return army
 
-    // полная армия (target −1), занятая или несуществующая ячейка
-    if (slots[target] !== null) return army
-
-    const next = [...slots]
+    const next = narrow ? compact(army.slots) : [...army.slots]
     next[target] = { creatureId, count: NEW_TROOP_COUNT }
     return { ...army, slots: next }
   })

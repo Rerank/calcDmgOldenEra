@@ -6,22 +6,37 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type ReactNode,
 } from 'react'
 import searchIcon from '../../assets/images/search.svg'
 import { t } from '../../i18n'
 import { filterGroups, type ComboboxGroup } from './comboboxFilter'
 import './combobox.css'
 
+/**
+ * Своя кнопка вместо поля-селекта — например, пустая ячейка армии «+».
+ * Подписи рядом нет, поэтому доступное имя кнопки и списка — label.
+ */
+type CustomTrigger = {
+  className: string
+  content: ReactNode
+  label: string
+}
+
 type Props = {
-  /** id кнопки-поля; от него строятся id списка и опций */
+  /** id кнопки; от него строятся id списка и опций */
   id: string
-  /** id подписи поля: по ней называются и кнопка, и список */
-  labelId: string
+  /** id подписи поля: по ней называются и кнопка, и список. Не нужен при своей кнопке */
+  labelId?: string
   value: string
   /** подпись поля, когда значения в списке нет — у шаблонов это «Свой» */
-  emptyLabel: string
+  emptyLabel?: string
+  /** своя кнопка вместо поля-селекта */
+  trigger?: CustomTrigger
   groups: ComboboxGroup[]
   searchPlaceholder: string
+  /** на каких экранах список раскрывается на весь экран, а не под кнопкой */
+  fullscreenQuery?: string
   onChange: (value: string) => void
 }
 
@@ -35,21 +50,44 @@ const MAX_HEIGHT = 420
 const MIN_HEIGHT_BELOW = 240
 /** Совсем тесное окно: меньше этого список не сжимаем. */
 const MIN_HEIGHT = 120
+/**
+ * Ширина списка при своей кнопке — как у поля «Шаблон» в калькуляторе.
+ * Совпадает с combobox.css. При обычном поле список шириной с поле.
+ */
+const BUTTON_POPUP_WIDTH = 340
+/** Телефон: список на весь экран. Совпадает с компактной метрикой в variables.css. */
+const PHONE = '(max-width: 600px)'
 
-type Placement = { up: boolean; maxHeight: number }
+type Placement = {
+  up: boolean
+  maxHeight: number
+  /** выровнять по правому краю кнопки: вправо список не помещается */
+  end: boolean
+  /** на весь экран вместо выпадающего списка */
+  fullscreen: boolean
+}
 
 /**
- * Куда раскрыться. По умолчанию — вниз, так привычнее; вверх — только если
- * снизу тесно, а сверху просторнее. Высота считается от места до края окна
- * с отступом, поэтому список не упирается в нижнюю кромку.
+ * Куда и как раскрыться. На узком экране — на весь экран: решает медиазапрос
+ * в момент раскрытия. Иначе по умолчанию — вниз, так привычнее; вверх — только
+ * если снизу тесно, а сверху просторнее. Высота считается от места до края
+ * окна с отступом, поэтому список не упирается в нижнюю кромку.
+ *
+ * Список шире своей кнопки (ячейка армии — 98px) растёт вправо от её левого
+ * края, а если там не хватает места — влево от правого.
  */
-function placeNear(trigger: HTMLElement): Placement {
+function placeNear(trigger: HTMLElement, popupWidth: number | null, fullscreenQuery: string): Placement {
   const box = trigger.getBoundingClientRect()
   const below = window.innerHeight - box.bottom - GAP - EDGE_MARGIN
   const above = box.top - GAP - EDGE_MARGIN
   const up = below < MIN_HEIGHT_BELOW && above > below
 
-  return { up, maxHeight: Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, up ? above : below)) }
+  return {
+    up,
+    maxHeight: Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, up ? above : below)),
+    end: popupWidth !== null && box.left + popupWidth > window.innerWidth - EDGE_MARGIN,
+    fullscreen: matchMedia(fullscreenQuery).matches,
+  }
 }
 
 /**
@@ -79,22 +117,32 @@ function revealOption(list: HTMLElement, option: HTMLElement, center: boolean) {
  * реализация подходит и мыши, и пальцу: на ПК поиск сразу получает фокус,
  * и можно печатать; на сенсорном экране фокус не ставится, клавиатура
  * не выезжает, и список просто листается. На узком экране список
- * раскрывается на весь экран — это решает CSS, логика та же.
+ * раскрывается на весь экран, логика та же.
+ *
+ * Вместо поля-селекта может быть своя кнопка (trigger) — список, поиск
+ * и клавиатура остаются теми же.
  */
 export function Combobox({
   id,
   labelId,
   value,
   emptyLabel,
+  trigger,
   groups,
   searchPlaceholder,
+  fullscreenQuery = PHONE,
   onChange,
 }: Props) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   /** подсвеченная опция: сквозной номер по всем видимым группам */
   const [active, setActive] = useState(0)
-  const [placement, setPlacement] = useState<Placement>({ up: false, maxHeight: MAX_HEIGHT })
+  const [placement, setPlacement] = useState<Placement>({
+    up: false,
+    maxHeight: MAX_HEIGHT,
+    end: false,
+    fullscreen: false,
+  })
 
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -117,8 +165,14 @@ export function Combobox({
   const listId = `${id}-list`
   const optionId = (index: number) => `${id}-option-${index}`
 
+  // Подпись списка и поиска: у поля — внешняя подпись, у своей кнопки — её label
+  const listLabel = trigger ? { 'aria-label': trigger.label } : { 'aria-labelledby': labelId }
+
   const openList = (initialQuery: string, focusSearch: boolean) => {
-    if (triggerRef.current) setPlacement(placeNear(triggerRef.current))
+    if (triggerRef.current) {
+      const popupWidth = trigger ? BUTTON_POPUP_WIDTH : null
+      setPlacement(placeNear(triggerRef.current, popupWidth, fullscreenQuery))
+    }
 
     // Без запроса курсор встаёт на текущее значение, с запросом — на первую
     // находку. Если значения в списке нет (у шаблонов — «Свой»), не подсвечено
@@ -216,30 +270,58 @@ export function Combobox({
     }
   }
 
+  // Поведение кнопки одно для поля и для своей кнопки — различаются только вид и подпись
+  const triggerProps = {
+    ref: triggerRef,
+    type: 'button',
+    id,
+    'aria-haspopup': 'listbox',
+    'aria-expanded': open,
+    'aria-controls': open ? listId : undefined,
+    onClick: () => (open ? close(false) : openList('', matchMedia('(pointer: fine)').matches)),
+    onKeyDown: onTriggerKeyDown,
+  } as const
+
+  const rootCls = ['combobox', trigger && 'combobox--button', open && 'combobox--open']
+    .filter(Boolean)
+    .join(' ')
+
+  const popupCls = [
+    'combobox__popup',
+    placement.up && 'combobox__popup--up',
+    placement.end && 'combobox__popup--end',
+    placement.fullscreen && 'combobox__popup--fullscreen',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <div className={`combobox${open ? ' combobox--open' : ''}`} ref={rootRef}>
-      <button
-        ref={triggerRef}
-        type="button"
-        id={id}
-        className="combobox__trigger"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? listId : undefined}
-        aria-labelledby={`${labelId} ${id}`}
-        onClick={() => (open ? close(false) : openList('', matchMedia('(pointer: fine)').matches))}
-        onKeyDown={onTriggerKeyDown}
-      >
-        <span className="combobox__value">{selected?.label ?? emptyLabel}</span>
-        <span className="combobox__arrow" aria-hidden="true">
-          ▼
-        </span>
-      </button>
+    <div className={rootCls} ref={rootRef}>
+      {trigger ? (
+        <button
+          {...triggerProps}
+          className={`combobox__button ${trigger.className}`}
+          aria-label={trigger.label}
+        >
+          {trigger.content}
+        </button>
+      ) : (
+        <button
+          {...triggerProps}
+          className="combobox__trigger"
+          aria-labelledby={`${labelId} ${id}`}
+        >
+          <span className="combobox__value">{selected?.label ?? emptyLabel}</span>
+          <span className="combobox__arrow" aria-hidden="true">
+            ▼
+          </span>
+        </button>
+      )}
 
       {open && (
         <div
-          className={`combobox__popup${placement.up ? ' combobox__popup--up' : ''}`}
-          // переменной, а не max-height: на узком экране CSS её просто не использует
+          className={popupCls}
+          // переменной, а не max-height: на весь экран CSS её просто не использует
           style={{ '--combobox-max-height': `${placement.maxHeight}px` } as CSSProperties}
           onKeyDown={onPopupKeyDown}
         >
@@ -256,7 +338,7 @@ export function Combobox({
                 aria-controls={listId}
                 aria-autocomplete="list"
                 aria-activedescendant={options[active] ? optionId(active) : undefined}
-                aria-labelledby={labelId}
+                {...listLabel}
                 placeholder={searchPlaceholder}
                 autoComplete="off"
                 spellCheck={false}
@@ -283,7 +365,7 @@ export function Combobox({
             id={listId}
             className="combobox__list"
             role="listbox"
-            aria-labelledby={labelId}
+            {...listLabel}
             tabIndex={-1}
           >
             {filtered.map((group, groupIndex) => {

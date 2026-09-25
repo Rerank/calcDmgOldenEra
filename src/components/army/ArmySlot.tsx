@@ -3,28 +3,46 @@ import { F } from '../../domain/rules'
 import { lang, t } from '../../i18n'
 import type { Troop } from '../../state/armyTransitions'
 import { creatureIcon } from '../creatureIcons'
+import { TEMPLATE_GROUPS } from '../templateGroups'
+import { Combobox } from '../ui/Combobox'
 import { Stepper } from '../ui/Stepper'
+import { NARROW } from './narrow'
 import './army-slot.css'
 
 type Props = {
+  /** уникален на странице: от него строятся id списка выбора */
+  id: string
   /** null — пустая ячейка */
   troop: Troop | null
+  /** отряд только что добавили: фокус — в его количество */
+  focusCount: boolean
+  onAdd: (creatureId: string) => void
   onRemove: () => void
   onCountChange: (count: number) => void
 }
 
 /**
  * Ячейка армии. Карточка одна на ПК и на телефоне: имя, картинка, количество.
- * Пустая ячейка — сама кнопка «добавить существо».
+ *
+ * Пустая ячейка — сама кнопка выбора существа. Список тот же, что у поля
+ * «Шаблон» в калькуляторе: группы фракций, ранг справа, тот же поиск. На ПК
+ * он раскрывается под ячейкой, на узком экране — на весь экран: там ячейка
+ * стоит в ленте с прокруткой, и выпавший под ней список лента обрезала бы.
  */
-export function ArmySlot({ troop, onRemove, onCountChange }: Props) {
+export function ArmySlot({ id, troop, focusCount, onAdd, onRemove, onCountChange }: Props) {
   if (!troop) {
     return (
       <li className="army-slot army-slot--empty">
         <span className="army-slot__name">{t.emptySlot}</span>
-        <button className="army-slot__cell army-slot__add" type="button" aria-label={t.addTroop}>
-          +
-        </button>
+        <Combobox
+          id={id}
+          value=""
+          trigger={{ className: 'army-slot__cell army-slot__add', content: '+', label: t.addTroop }}
+          groups={TEMPLATE_GROUPS}
+          searchPlaceholder={t.templateSearch}
+          fullscreenQuery={NARROW}
+          onChange={onAdd}
+        />
       </li>
     )
   }
@@ -55,6 +73,7 @@ export function ArmySlot({ troop, onRemove, onCountChange }: Props) {
 
       <Stepper
         compact
+        autoFocus={focusCount}
         value={troop.count}
         {...F.count}
         label={name}

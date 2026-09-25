@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { t } from '../../i18n'
 import { clamp, useNumberInput } from './useNumberInput'
 import './stepper.css'
@@ -18,6 +19,12 @@ export type StepperProps = {
   inputLabel?: string
   /** компактный вид во всю ширину ячейки армии: 98px вместо 144px */
   compact?: boolean
+  /**
+   * Поставить фокус в поле и выделить число: набранное заменит его,
+   * а не допишется. Срабатывает, когда флаг включается, — не на каждой
+   * перерисовке.
+   */
+  autoFocus?: boolean
   /** фиксированный знак перед числом: «+» у увеличения, «−» у уменьшения */
   sign?: string
   /** единица измерения после числа */
@@ -37,12 +44,24 @@ export function Stepper({
   label,
   inputLabel,
   compact,
+  autoFocus,
   sign,
   unit,
   boosted,
   title,
 }: StepperProps) {
   const input = useNumberInput({ value, min, max, onChange })
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Срабатывает, когда поле становится целью фокуса: при появлении с autoFocus
+  // или когда флаг включили уже смонтированному полю. Перерисовки с тем же
+  // флагом фокус не трогают. Нативный autoFocus не подходит: он срабатывает
+  // только при монтировании и не выделяет число.
+  useEffect(() => {
+    if (!autoFocus) return
+    inputRef.current?.focus()
+    inputRef.current?.select()
+  }, [autoFocus])
 
   const fieldCls = 'stepper__field' + (sign || unit ? ' stepper__field--with-unit' : '')
   const inputCls = 'stepper__input' + (boosted ? ' stepper__input--boosted' : '')
@@ -61,7 +80,14 @@ export function Stepper({
 
       <div className={fieldCls}>
         {sign && <span className="stepper__sign">{sign}</span>}
-        <input className={inputCls} id={id} title={title} aria-label={inputLabel} {...input} />
+        <input
+          ref={inputRef}
+          className={inputCls}
+          id={id}
+          title={title}
+          aria-label={inputLabel}
+          {...input}
+        />
         {unit && <span className="stepper__unit">{unit}</span>}
       </div>
 

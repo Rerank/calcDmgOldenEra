@@ -6,6 +6,7 @@ import {
   addTroop,
   DEFAULT_ARMIES,
   emptyArmy,
+  landingSlot,
   removeArmy,
   removeTroop,
   setCount,
@@ -89,6 +90,20 @@ describe('отряды на узком экране: армия всегда с�
     const armies = addTroop([army('a', [troop('a1'), null, troop('a3')])], 'a', 1, 'griffin', true)
 
     expect(ids(armies, 0)).toEqual(['a1', 'a3', 'griffin', null, null, null, null])
+  })
+})
+
+describe('куда встанет новый отряд — по этому номеру ставится фокус', () => {
+  const withHole = army('a', [troop('a1'), null, troop('a3')])
+
+  test('на ПК — кликнутая ячейка, если она пуста', () => {
+    expect(landingSlot(withHole, 1, false)).toBe(1)
+    expect(landingSlot(withHole, 0, false)).toBe(-1)
+    expect(landingSlot(withHole, ARMY_RULES.slots, false)).toBe(-1)
+  })
+
+  test('на узком экране — сразу за последним отрядом сжатой армии', () => {
+    expect(landingSlot(withHole, 6, true)).toBe(2)
   })
 })
 
