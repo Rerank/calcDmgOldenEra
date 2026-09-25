@@ -1,8 +1,7 @@
 import { CREATURE_TEMPLATES, FACTIONS } from '../data/creatures'
 import { lang } from '../i18n'
+import { ROMAN } from './roman'
 import type { ComboboxGroup } from './ui/comboboxFilter'
-
-const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
 
 /**
  * Список шаблонов для комбобокса: фракции в порядке справочника, внутри —

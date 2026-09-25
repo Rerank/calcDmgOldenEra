@@ -11,6 +11,13 @@ export type StepperProps = {
   step?: number
   /** доступное имя для кнопок ±: «Атака: уменьшить» */
   label: string
+  /**
+   * Доступное имя самого поля, когда видимой подписи рядом нет: «Мечник:
+   * количество». Обычно поле подписывает <label htmlFor={id}> снаружи.
+   */
+  inputLabel?: string
+  /** компактный вид во всю ширину ячейки армии: 98px вместо 144px */
+  compact?: boolean
   /** фиксированный знак перед числом: «+» у увеличения, «−» у уменьшения */
   sign?: string
   /** единица измерения после числа */
@@ -28,6 +35,8 @@ export function Stepper({
   max,
   step = 1,
   label,
+  inputLabel,
+  compact,
   sign,
   unit,
   boosted,
@@ -39,7 +48,7 @@ export function Stepper({
   const inputCls = 'stepper__input' + (boosted ? ' stepper__input--boosted' : '')
 
   return (
-    <div className="stepper">
+    <div className={'stepper' + (compact ? ' stepper--compact' : '')}>
       <button
         className="stepper__btn stepper__btn--dec"
         type="button"
@@ -52,7 +61,7 @@ export function Stepper({
 
       <div className={fieldCls}>
         {sign && <span className="stepper__sign">{sign}</span>}
-        <input className={inputCls} id={id} title={title} {...input} />
+        <input className={inputCls} id={id} title={title} aria-label={inputLabel} {...input} />
         {unit && <span className="stepper__unit">{unit}</span>}
       </div>
 

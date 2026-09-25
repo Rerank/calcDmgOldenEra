@@ -37,6 +37,7 @@
   --color-defender:      #2d5266; /* синий, защищающийся и ответный удар */
   --color-link-hover:    #a93c31;
   --color-boosted:       #2eb424; /* параметр, увеличенный бонусом героя */
+  --color-power:         #876214; /* золотой, мощность армии — третий акцент рядом с уроном и живучестью */
 
   /* — Типографика — */
   --font-serif: "Spectral", Georgia, "Times New Roman", serif;
