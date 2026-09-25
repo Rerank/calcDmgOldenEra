@@ -26,7 +26,7 @@
 Одностраничное приложение без сервера. Пользователь задаёт параметры двух отрядов — атакующего
 и защищающегося, — а калькулятор показывает, сколько урона получит каждая сторона от удара и ответного удара: минимум, максимум и среднее, сколько существ погибнет и сколько здоровья останется у верхнего.
 
-- **Сайт:** https://rerank.github.io/caclDmgOldenEra/
+- **Сайт:** https://rerank.github.io/calcDmgOldenEra/
 - **Источник формул:** [гайд по механике PvP-боя](https://paradrew.com/ru/olden-era/guides/pvp-combat-mechanics/)
   на paradrew.com; правило округления сверено с игрой.
 - **Стек:** React 19, TypeScript 6, Vite 8, Vitest 5, линтер oxlint. Стили — обычный CSS по БЭМ,
@@ -41,13 +41,13 @@
 Нужен **Node.js 20.19+ или 22.12+** — этого требует Vite 8. Проект разрабатывается на Node 24.
 
 ```bash
-git clone https://github.com/Rerank/caclDmgOldenEra.git
-cd caclDmgOldenEra
+git clone https://github.com/Rerank/calcDmgOldenEra.git
+cd calcDmgOldenEra
 npm install
 npm run dev
 ```
 
-Открой **http://localhost:5173/caclDmgOldenEra/** — именно с подпапкой. Сайт публикуется на GitHub
+Открой **http://localhost:5173/calcDmgOldenEra/** — именно с подпапкой. Сайт публикуется на GitHub
 Pages в подпапку с именем репозитория, и в [vite.config.ts](vite.config.ts) она задана для всех
 режимов, включая разработку. По адресу `localhost:5173/` без подпапки Vite покажет подсказку,
 а не приложение.
@@ -59,7 +59,7 @@ Pages в подпапку с именем репозитория, и в [vite.co
 | `npx vitest` | тесты в режиме наблюдения: перезапускаются при изменении файлов |
 | `npm run lint` | линтер oxlint |
 | `npm run build` | проверка типов (`tsc -b`) и сборка в `dist` |
-| `npm run preview` | сервер для собранного `dist` — ровно то, что уедет на сайт: http://localhost:4173/caclDmgOldenEra/ |
+| `npm run preview` | сервер для собранного `dist` — ровно то, что уедет на сайт: http://localhost:4173/calcDmgOldenEra/ |
 | `npm run predeploy` | все проверки перед публикацией, ничего не публикуя |
 | `npm run deploy` | проверки, сборка и публикация на GitHub Pages — см. [Публикация](#публикация) |
 
