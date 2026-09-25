@@ -1,0 +1,60 @@
+/* ============================================================
+   army-compare — экран сравнения армий: армии и «Итог» под ними.
+
+   ПК: армии друг под другом, «Добавить армию» — по центру под ними.
+   До 900px семь ячеек в ряд уже не помещаются, и раскладка
+   транспонируется: армии встают в горизонтальную ленту со свайпом,
+   отряды внутри армии — в столбик. Разметка та же, меняется только CSS.
+   ============================================================ */
+
+.army-compare,
+.army-compare__armies {
+  display: flex;
+  flex-direction: column;
+  gap: 28px; /* как между панелями результатов калькулятора */
+}
+
+.army-compare__add {
+  align-self: center;
+}
+
+@media (max-width: 900px) {
+  .army-compare__armies {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+
+    /* свайп останавливается ровно на армии, а не посередине */
+    scroll-snap-type: x mandatory;
+
+    /* Лента выходит за отступы страницы: соседняя армия выглядывает из-за
+       края экрана, а не обрезается по отступу. Отступы возвращаем внутрь,
+       чтобы первая армия стояла на своём месте и привязка их учитывала.
+       Снизу — место под «бумажную» тень: прокрутка обрезала бы её. */
+    margin-inline: calc(-1 * var(--page-padding));
+    padding: 0 var(--page-padding) calc(var(--shadow-offset) + 2px);
+    scroll-padding-inline: var(--page-padding);
+  }
+
+  /* «Добавить армию» — узкая колонка в конце ленты, во всю её высоту */
+  .army-compare__add {
+    flex: 0 0 56px;
+    align-self: stretch;
+    aspect-ratio: auto;
+    scroll-snap-align: end;
+  }
+
+  .army-compare__add .button__icon {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* как между панелями результатов калькулятора на телефоне */
+  .army-compare {
+    gap: 22px;
+  }
+}

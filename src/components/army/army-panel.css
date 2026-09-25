@@ -1,0 +1,97 @@
+/* ============================================================
+   army-panel — панель армии: шапка с номером и численностью,
+   семь ячеек отрядов, итоговые индексы.
+
+   Фон, рамку, тень и шапку даёт result-panel (микс классов
+   в разметке): панели армий выглядят так же, как результаты
+   калькулятора.
+   ============================================================ */
+
+.army-panel__heading {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.army-panel__count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-meta);
+}
+
+/* Семь ячеек в ряд, как в игре: 7 × 98 + 6 × 12 = 758px */
+.army-panel__slots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 20px 20px 16px;
+  list-style: none;
+}
+
+/* Итоговые индексы армии: три колонки под ячейками */
+.army-panel__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--color-divider);
+}
+
+/* ─────────────  Узкий экран: армия — колонка ленты  ───────────── */
+
+@media (max-width: 900px) {
+  /* Армия — узкая колонка по ширине карточки отряда: на телефоне 375px
+     помещаются две армии, а третья выглядывает из-за края — видно,
+     что ленту можно листать. Уже 150px нельзя: в шапке не уместятся
+     «Армия III» и кнопка «×». */
+  .army-panel {
+    flex: 0 0 150px;
+    scroll-snap-align: start;
+
+    /* столбиком — чтобы индексы можно было прижать к низу, см. .army-panel__stats */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Шапка армии: название и количество в две строки, «×» справа */
+  .army-panel__header {
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 10px 12px 12px;
+  }
+
+  .army-panel__heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  /* Заголовок — телефонного размера на всём узком экране, а не только
+     до 600px: на планшете крупный кегль result-panel не помещал «Армия II»
+     в колонку 150px, заголовок переносился, и ячейки соседних армий
+     начинались на разной высоте */
+  .army-panel__header .result-panel__title {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+  }
+
+  /* Отряды — столбиком, карточка та же, что на ПК: имя, картинка, количество */
+  .army-panel__slots {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  /* Индексы армии — в три строки: подпись, под ней число. Рядом им
+     в узкой колонке не уместиться.
+
+     Прижаты к низу панели. Панели в ленте одной высоты — по самой длинной
+     армии, поэтому индексы всех армий стоят на одной линии, сколько бы
+     отрядов ни было в каждой. */
+  .army-panel__stats {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: auto;
+  }
+}

@@ -119,6 +119,16 @@ export const ru = {
   damageIndex: 'Индекс урона',
   hardinessIndex: 'Индекс живучести',
   powerIndex: 'Индекс мощности',
+  /** «Армия III»: номер римской цифрой добавляет armyName */
+  army: 'Армия',
+  addArmy: 'Добавить армию',
+  removeArmy: 'Убрать армию',
+  emptySlot: 'пусто',
+  addTroop: 'Добавить существо',
+  /** «Убрать отряд: Мечник» */
+  removeTroop: 'Убрать отряд',
+  /** поле количества в ячейке: «Мечник: количество» */
+  quantity: 'количество',
   /** пояснения под «Подробнее»; термины в начале строк — damageIndex, hardinessIndex, powerIndex */
   armyNotes: {
     damage:

@@ -1,0 +1,112 @@
+/* ============================================================
+   army-slot — ячейка армии: имя, картинка 96px, количество.
+   Пустая ячейка — пунктирная кнопка «+».
+   ============================================================ */
+
+.army-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 98px;
+}
+
+.army-slot__name {
+  height: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--color-text-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.army-slot--empty .army-slot__name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--color-text-meta);
+}
+
+/* 98px с рамкой — внутри ровно 96px, размер картинки: без растягивания */
+.army-slot__cell {
+  position: relative;
+  width: 98px;
+  height: 98px;
+  background-color: var(--color-control);
+  border: 1px solid var(--color-border);
+}
+
+.army-slot__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Пустая ячейка — сама кнопка «добавить существо» */
+.army-slot__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-style: dashed;
+  border-color: var(--color-border-strong);
+  font-family: var(--font-mono);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--color-text-meta);
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.army-slot__add:hover {
+  background-color: var(--color-control-hover);
+  color: var(--color-attacker);
+}
+
+/* «×» в углу занятой ячейки; сдвиг на −1px кладёт его рамку на рамку ячейки */
+.army-slot__remove {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.army-slot__remove:hover {
+  background-color: var(--color-attacker);
+  border-color: var(--color-attacker);
+  color: var(--color-on-accent);
+}
+
+/* ─────────────  Узкий экран: армия столбиком  ───────────── */
+
+@media (max-width: 900px) {
+  /* Пустые ячейки — в конец столбика. Обычно они и так в конце: на узком
+     экране армия сжата. Но дыры, оставшиеся с ПК (повернули планшет),
+     до первой правки ещё в разметке — порядок их прячет. */
+  .army-slot--empty {
+    order: 1;
+  }
+
+  /* В столбик семь пустых ячеек заняли бы экран без пользы, поэтому видна
+     только одна: правило прячет каждую пустую, перед которой в разметке уже
+     есть другая пустая. Заполнили её — видна следующая, заполнили все
+     семь — пустых не остаётся. На ПК видны все, как в игре. */
+  .army-slot--empty ~ .army-slot--empty {
+    display: none;
+  }
+}

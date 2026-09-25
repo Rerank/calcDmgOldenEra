@@ -1,0 +1,72 @@
+/* ============================================================
+   army-stat — итоговый индекс армии: подпись и число.
+   Модификатор — метрика: --damage, --hardiness, --power.
+   ============================================================ */
+
+/* Урон, живучесть и мощность окрашены везде одинаково: в итогах армии,
+   в таблице «Итога», в полосках. Модификатор задаёт переменную, элементы
+   берут цвет из неё — как --side-accent у сторон боя. */
+.army-stat--damage {
+  --metric-accent: var(--color-attacker);
+}
+
+.army-stat--hardiness {
+  --metric-accent: var(--color-defender);
+}
+
+.army-stat--power {
+  --metric-accent: var(--color-power);
+}
+
+.army-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.army-stat + .army-stat {
+  border-left: 1px solid var(--color-divider);
+}
+
+.army-stat__label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-meta);
+}
+
+.army-stat__value {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--metric-accent);
+  white-space: nowrap;
+}
+
+/* На узком экране индексы идут в три строки: подпись, под ней число */
+@media (max-width: 900px) {
+  .army-stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 12px;
+  }
+
+  .army-stat__label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .army-stat + .army-stat {
+    border-left: 0;
+    border-top: 1px solid var(--color-divider);
+  }
+
+  .army-stat__value {
+    font-size: 18px;
+  }
+}
