@@ -1,0 +1,51 @@
+/* ============================================================
+   army-summary — «Итог» сравнения: вердикт в шапке, таблица
+   армий (army-table) и пояснение под ней.
+
+   Шапку и рамку даёт result-panel (микс классов в разметке):
+   это тот же «Итог», что в калькуляторе.
+   ============================================================ */
+
+.army-summary__verdict {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.army-summary__leader {
+  font-weight: 700;
+  color: var(--color-power);
+}
+
+.army-summary__body {
+  padding: 20px;
+}
+
+/* Пояснение под таблицей — как расшифровка формулы в карточках калькулятора */
+.army-summary__note {
+  margin: 14px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text-meta);
+}
+
+@media (max-width: 600px) {
+  /* вердикт длинный — уходит под заголовок «Итог» */
+  .army-summary__header {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .army-summary__verdict {
+    font-size: 14px;
+  }
+
+  .army-summary__body {
+    padding: 16px 14px;
+  }
+
+  .army-summary__note {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,142 @@
+/* ============================================================
+   army-table — таблица «Итога»: армии по строкам, индексы
+   урона, живучести и мощности по колонкам. У каждого значения —
+   полоска длиной с долю от лучшего в колонке.
+   ============================================================ */
+
+/* Цвет метрики — как в итогах армии (army-stat): модификатор задаёт
+   переменную, заголовок, значение лидера и полоска берут цвет из неё */
+.army-table__head--damage,
+.army-table__cell--damage {
+  --metric-accent: var(--color-attacker);
+}
+
+.army-table__head--hardiness,
+.army-table__cell--hardiness {
+  --metric-accent: var(--color-defender);
+}
+
+.army-table__head--power,
+.army-table__cell--power {
+  --metric-accent: var(--color-power);
+}
+
+.army-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.army-table__col-label {
+  width: 160px;
+}
+
+.army-table__corner,
+.army-table__head {
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--color-divider-dot);
+}
+
+/* строчными, как «мин / макс / сред» у таблицы калькулятора:
+   подпись та же, что в итогах армии, где она набрана капителью */
+.army-table__head {
+  padding-left: 28px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  text-align: right;
+  text-transform: lowercase;
+  letter-spacing: 0.06em;
+  color: var(--metric-accent);
+}
+
+.army-table__label,
+.army-table__cell {
+  padding: 12px 0;
+  border-bottom: 1px dotted var(--color-divider-dot);
+}
+
+.army-table__label {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: left;
+  color: var(--color-text-label);
+}
+
+/* отступ между колонками чисел — слева от каждой */
+.army-table__cell {
+  padding-left: 28px;
+}
+
+.army-table__value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  text-align: right;
+  color: var(--color-text-number);
+  white-space: nowrap;
+}
+
+/* лучший результат в колонке — цветом метрики и жирным */
+.army-table__cell--leader .army-table__value {
+  font-weight: 700;
+  color: var(--metric-accent);
+}
+
+/* Полоска — доля от лучшего в колонке. Ширину заливки задаёт разметка */
+.army-table__bar {
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  background-color: var(--color-control);
+}
+
+.army-table__fill {
+  display: block;
+  height: 100%;
+  background-color: var(--metric-accent);
+}
+
+/* Отставание от лучшего в колонке — тише и мельче самого числа.
+   Считается от той же точки, что и полоска, поэтому они не спорят. */
+.army-table__diff {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-meta);
+}
+
+/* В узкой колонке процент и число в одну строку не помещаются —
+   процент встаёт строкой выше числа */
+@media (max-width: 900px) {
+  .army-table__diff {
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  .army-table__col-label {
+    width: 84px;
+  }
+
+  .army-table__head {
+    padding-left: 12px;
+    font-size: 11px;
+  }
+
+  .army-table__label {
+    padding: 10px 0;
+    font-size: 14px;
+  }
+
+  .army-table__cell {
+    padding: 10px 0 10px 12px;
+  }
+
+  .army-table__value {
+    font-size: 16px;
+  }
+
+  .army-table__diff {
+    font-size: 11px;
+  }
+}

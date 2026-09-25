@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { findTemplate } from '../data/creatures'
-import { armyStats } from '../domain/army'
+import { armyStats, compareArmies } from '../domain/army'
 import type { ArmyStack } from '../domain/types'
 import * as transitions from './armyTransitions'
 import type { Army } from './armyTransitions'
@@ -14,10 +14,14 @@ import type { Army } from './armyTransitions'
  */
 export function useArmies() {
   const [armies, setArmies] = useState<Army[]>(transitions.DEFAULT_ARMIES)
+  const stats = armies.map((army) => armyStats(stacksOf(army)))
 
   return {
     armies,
-    stats: armies.map((army) => armyStats(stacksOf(army))),
+    /** итоги армий — в том же порядке, что и армии */
+    stats,
+    /** места армий в колонках и вердикт для «Итога» */
+    comparison: compareArmies(stats),
 
     addArmy: () => setArmies((current) => transitions.addArmy(current, crypto.randomUUID())),
 

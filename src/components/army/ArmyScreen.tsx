@@ -6,13 +6,15 @@ import { landingSlot, type Army } from '../../state/armyTransitions'
 import { AppHeader } from '../AppHeader'
 import { Button } from '../ui/Button'
 import { ArmyPanel } from './ArmyPanel'
+import { ArmySummary } from './ArmySummary'
 import { armyName } from './armyFormat'
 import { isNarrow } from './narrow'
 import './army-compare.css'
 
-/** Экран сравнения армий: шапка, армии и — следующим этапом — «Итог». */
+/** Экран сравнения армий: шапка, армии и «Итог» под ними. */
 export function ArmyScreen() {
-  const { armies, stats, addArmy, removeArmy, addTroop, removeTroop, setCount } = useArmies()
+  const { armies, stats, comparison, addArmy, removeArmy, addTroop, removeTroop, setCount } =
+    useArmies()
   const armiesRef = useRef<HTMLDivElement>(null)
 
   /** ячейка только что добавленного отряда: туда встанет фокус */
@@ -104,6 +106,12 @@ export function ArmyScreen() {
             </Button>
           )}
         </div>
+
+        {/* Сравнивать есть что, только когда существа есть хотя бы в двух армиях:
+            при одной армии или одной непустой «Итога» нет */}
+        {comparison.verdict.kind !== 'none' && (
+          <ArmySummary stats={stats} comparison={comparison} />
+        )}
       </main>
     </>
   )
