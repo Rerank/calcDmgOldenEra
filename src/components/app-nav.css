@@ -1,0 +1,84 @@
+/* ============================================================
+   app-nav — верхняя строка страницы: название игры слева,
+   переключатель экранов справа. Одна на все экраны, поэтому
+   стоит над шапкой экрана, а не внутри неё.
+   На узком экране переключатель уходит второй строкой.
+   ============================================================ */
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  /* строка на 4px выше прежнего надзаголовка (отбивка и черта у ссылок) —
+     отступ меньше на столько же, и заголовок экрана стоит на прежнем месте */
+  margin-bottom: 2px;
+}
+
+/* Надзаголовок с названием игры */
+.app-nav__game {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-attacker);
+}
+
+.app-nav__links {
+  display: flex;
+  gap: 20px;
+}
+
+/* Пункт переключателя. Набор — как у надзаголовка, но тише:
+   красным остаётся только название игры */
+.app-nav__link {
+  padding-bottom: 2px;
+  /* подчёркивание текущего экрана — рамкой: её толщина не зависит от шрифта */
+  border-bottom: 2px solid transparent;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  color: var(--color-text-meta);
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+/* двойной класс — сильнее общего a:hover из base.css */
+.app-nav__link:hover {
+  color: var(--color-attacker);
+}
+
+/* Текущий экран: тёмный текст и красная черта под ним. На ховер
+   не реагирует — переходить некуда */
+.app-nav__link--current,
+.app-nav__link--current:hover {
+  color: var(--color-text);
+  border-bottom-color: var(--color-attacker);
+}
+
+/* До 900px страница не шире 560px, и переключатель всегда уходит второй
+   строкой — прямо над заголовком. Черте под текущим экраном нужен воздух */
+@media (max-width: 900px) {
+  .app-nav {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-nav__game {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+
+  .app-nav__links {
+    gap: 16px;
+  }
+
+  .app-nav__link {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+}

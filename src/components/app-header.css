@@ -1,6 +1,7 @@
 /* ============================================================
-   app-header — шапка: название игры, заголовок, формула урона
-   и раскрывающиеся пояснения к ней.
+   app-header — шапка экрана: заголовок, вводная строка
+   (формула урона или описание экрана) и раскрывающиеся
+   пояснения к ней.
    ============================================================ */
 
 .app-header {
@@ -8,16 +9,6 @@
   /* «двойная линия» под заголовком */
   border-bottom: 3px double var(--color-rule);
   margin-bottom: 28px;
-}
-
-/* Надзаголовок с названием игры */
-.app-header__game {
-  margin-bottom: 6px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--color-attacker);
 }
 
 .app-header__title {
@@ -28,9 +19,9 @@
   color: var(--color-text);
 }
 
-/* Формула и пояснения к ней — один текст, поэтому и набор один:
+/* Вводная строка и пояснения к ней — один текст, поэтому и набор один:
    правило общее, чтобы они не разошлись */
-.app-header__formula,
+.app-header__lead,
 .app-header__notes {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -38,16 +29,16 @@
   color: var(--color-text-formula);
 }
 
-.app-header__formula {
+.app-header__lead {
   margin-top: 10px;
 }
 
-/* Слагаемое формулы не разрывается: перенос только перед «×» */
+/* Слагаемое формулы калькулятора не разрывается: перенос только перед «×» */
 .app-header__term {
   white-space: nowrap;
 }
 
-/* «Подробнее» — второй строкой под формулой. Цвет — как у формулы:
+/* «Подробнее» — второй строкой под вводной. Цвет — как у неё:
    подпись стоит на фоне страницы, а он темнее панели, и цветом
    «Дополнительно» читалась бы бледнее — контраст ниже. */
 .app-header__more {
@@ -76,21 +67,16 @@
     margin-bottom: 20px;
   }
 
-  .app-header__game {
-    font-size: 10px;
-    letter-spacing: 0.16em;
-  }
-
   .app-header__title {
     font-size: 24px;
   }
 
-  .app-header__formula,
+  .app-header__lead,
   .app-header__notes {
     font-size: 11px;
   }
 
-  .app-header__formula {
+  .app-header__lead {
     margin-top: 8px;
   }
 }
