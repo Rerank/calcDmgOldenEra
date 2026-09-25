@@ -83,3 +83,68 @@ export interface Entry {
   input: Input
   result: Result
 }
+
+// ─── Сравнение армий ───
+
+/**
+ * Параметры существа, нужные оценке армии. Описаны по форме, а не взяты
+ * из справочника: шаблон существа подходит сюда сам, и расчёт по-прежнему
+ * ничего не знает о справочнике.
+ */
+export interface ArmyUnit {
+  hp: number
+  attack: number
+  defense: number
+  damageMin: number
+  damageMax: number
+}
+
+/** Отряд армии: какое существо и сколько их. */
+export interface ArmyStack {
+  unit: ArmyUnit
+  count: number
+}
+
+/** Бонусы героя: прибавляются к атаке и защите всех существ его армии. */
+export interface ArmyHero {
+  attack: number
+  defense: number
+}
+
+/** Итог одной армии. */
+export interface ArmyStats {
+  /** сколько существ во всех отрядах; 0 — армия пустая */
+  count: number
+  /** индекс урона D: сколько урона армия наносит за один залп по цели с нулевой защитой */
+  damage: number
+  /** индекс живучести H: сколько урона армия выдержит, прежде чем погибнет целиком */
+  hardiness: number
+  /** индекс мощности √(D × H) */
+  power: number
+}
+
+/** Место армии в одной колонке сравнения. */
+export interface ArmyPlace {
+  /** доля от лучшего значения в колонке: 1 — лучшее, 0.5 — вдвое меньше; у пустой армии 0 */
+  share: number
+  /** лучшее значение в колонке; при равенстве лидеров несколько */
+  leader: boolean
+}
+
+/** Место армии во всех трёх колонках. */
+export type ArmyPlaces = Record<'damage' | 'hardiness' | 'power', ArmyPlace>
+
+/**
+ * Кто сильнее по мощности. Армии — номера в исходном списке.
+ * none — сравнивать нечего: существа есть меньше чем в двух армиях.
+ */
+export type ArmyVerdict =
+  | { kind: 'none' }
+  | { kind: 'leader'; army: number }
+  | { kind: 'tie'; armies: number[] }
+
+export interface ArmyComparison {
+  /** места армий — в том же порядке, что и армии на входе */
+  places: ArmyPlaces[]
+  verdict: ArmyVerdict
+}
