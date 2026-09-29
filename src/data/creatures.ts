@@ -1,9 +1,9 @@
 /**
  * Справочник существ Olden Era — разовая выгрузка из таблицы.
  *
- * Здесь только то, что влияет на урон: параметры и два флага. Стоимость,
- * прирост, инициатива, скорость, боевой дух и удача сюда не попали.
- * Умений существ в выгрузке не было, поэтому их нет и здесь.
+ * Здесь то, что влияет на урон, — параметры и два флага, — и недельный
+ * прирост. Стоимость, инициатива, скорость, боевой дух и удача сюда
+ * не попали. Умений существ в выгрузке не было, поэтому их нет и здесь.
  *
  * Справочник только заполняет поля панели в момент выбора шаблона.
  * Расчёт про него ничего не знает и видит лишь числа и тумблеры.
@@ -29,6 +29,12 @@ export interface CreatureTemplate {
   faction: FactionId
   /** ранг существа: I–VII у фракций, до VIII у нейтралов */
   tier: number
+  /**
+   * Базовый прирост — сколько существ прибавляется за неделю. Одинаков у всех
+   * существ одного ранга во фракции. Нет у нейтралов и у Огненной личинки:
+   * их не нанимают в городе.
+   */
+  growth?: number
   hp: number
   attack: number
   defense: number
@@ -57,6 +63,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Мечник', en: 'Swordsman' },
     faction: 'temple',
     tier: 1,
+    growth: 18,
     hp: 12, attack: 4, defense: 4, damageMin: 2, damageMax: 3,
   },
   {
@@ -64,6 +71,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Капитан стражи', en: 'Guard Captain' },
     faction: 'temple',
     tier: 1,
+    growth: 18,
     hp: 12, attack: 6, defense: 5, damageMin: 2, damageMax: 3,
   },
   {
@@ -71,6 +79,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Защитник зари', en: "Sun's Aegis" },
     faction: 'temple',
     tier: 1,
+    growth: 18,
     hp: 15, attack: 5, defense: 8, damageMin: 2, damageMax: 3,
   },
   {
@@ -78,6 +87,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Арбалетчик', en: 'Crossbowman' },
     faction: 'temple',
     tier: 2,
+    growth: 14,
     hp: 10, attack: 5, defense: 3, damageMin: 3, damageMax: 4,
     ranged: true,
     counterHalved: true,
@@ -87,6 +97,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Сокольничий', en: 'Austringer' },
     faction: 'temple',
     tier: 2,
+    growth: 14,
     hp: 10, attack: 5, defense: 3, damageMin: 3, damageMax: 4,
     ranged: true,
     counterHalved: true,
@@ -96,6 +107,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Тяжелый арбалетчик', en: 'Marksman' },
     faction: 'temple',
     tier: 2,
+    growth: 14,
     hp: 10, attack: 6, defense: 3, damageMin: 3, damageMax: 4,
     ranged: true,
     counterHalved: true,
@@ -105,6 +117,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Грифон', en: 'Griffin' },
     faction: 'temple',
     tier: 3,
+    growth: 7,
     hp: 30, attack: 7, defense: 6, damageMin: 5, damageMax: 9,
   },
   {
@@ -112,6 +125,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Храмовый грифон', en: 'Temple Griffin' },
     faction: 'temple',
     tier: 3,
+    growth: 7,
     hp: 30, attack: 8, defense: 6, damageMin: 5, damageMax: 9,
   },
   {
@@ -119,6 +133,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Сторожевой грифон', en: 'Guardian Griffin' },
     faction: 'temple',
     tier: 3,
+    growth: 7,
     hp: 30, attack: 9, defense: 10, damageMin: 7, damageMax: 7,
   },
   {
@@ -126,6 +141,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Жрица Солнца', en: 'Lightweaver' },
     faction: 'temple',
     tier: 4,
+    growth: 6,
     hp: 35, attack: 11, defense: 11, damageMin: 11, damageMax: 11,
     ranged: true,
     counterHalved: true,
@@ -135,6 +151,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Иерофантида', en: 'Hierophant' },
     faction: 'temple',
     tier: 4,
+    growth: 6,
     hp: 35, attack: 13, defense: 16, damageMin: 11, damageMax: 11,
     ranged: true,
     counterHalved: true,
@@ -144,6 +161,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Вестница Солнца', en: 'Sun Herald' },
     faction: 'temple',
     tier: 4,
+    growth: 6,
     hp: 35, attack: 16, defense: 13, damageMin: 11, damageMax: 18,
     ranged: true,
     counterHalved: true,
@@ -153,6 +171,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Кавалерия', en: 'Cavalry' },
     faction: 'temple',
     tier: 5,
+    growth: 3,
     hp: 85, attack: 12, defense: 17, damageMin: 10, damageMax: 14,
   },
   {
@@ -160,6 +179,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Благородная кавалерия', en: 'Noble Cavalry' },
     faction: 'temple',
     tier: 5,
+    growth: 3,
     hp: 85, attack: 12, defense: 17, damageMin: 12, damageMax: 16,
   },
   {
@@ -167,6 +187,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Солнечная кавалерия', en: 'Sunspear Cavalry' },
     faction: 'temple',
     tier: 5,
+    growth: 3,
     hp: 85, attack: 14, defense: 22, damageMin: 12, damageMax: 16,
   },
   {
@@ -174,6 +195,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Инквизитор', en: 'Inquisitor' },
     faction: 'temple',
     tier: 6,
+    growth: 2,
     hp: 90, attack: 20, defense: 24, damageMin: 19, damageMax: 23,
   },
   {
@@ -181,6 +203,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Игуменья', en: 'Mother Superior' },
     faction: 'temple',
     tier: 6,
+    growth: 2,
     hp: 125, attack: 20, defense: 28, damageMin: 19, damageMax: 23,
   },
   {
@@ -188,6 +211,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Карательница', en: 'Excommunicator' },
     faction: 'temple',
     tier: 6,
+    growth: 2,
     hp: 90, attack: 26, defense: 24, damageMin: 23, damageMax: 33,
   },
   {
@@ -195,6 +219,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Ангел', en: 'Angel' },
     faction: 'temple',
     tier: 7,
+    growth: 1,
     hp: 225, attack: 30, defense: 30, damageMin: 50, damageMax: 75,
     ranged: true,
     counterHalved: true,
@@ -204,6 +229,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Архангел', en: 'Archangel' },
     faction: 'temple',
     tier: 7,
+    growth: 1,
     hp: 225, attack: 35, defense: 30, damageMin: 50, damageMax: 75,
     ranged: true,
     counterHalved: true,
@@ -213,6 +239,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Апофеоз', en: 'Apotheosis' },
     faction: 'temple',
     tier: 7,
+    growth: 1,
     hp: 300, attack: 30, defense: 35, damageMin: 50, damageMax: 75,
     ranged: true,
     counterHalved: true,
@@ -224,6 +251,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Скелет', en: 'Skeleton' },
     faction: 'necropolis',
     tier: 1,
+    growth: 30,
     hp: 6, attack: 4, defense: 1, damageMin: 1, damageMax: 3,
   },
   {
@@ -231,6 +259,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Скелет-мечник', en: 'Skeleton Warrior' },
     faction: 'necropolis',
     tier: 1,
+    growth: 30,
     hp: 6, attack: 4, defense: 3, damageMin: 2, damageMax: 3,
   },
   {
@@ -238,6 +267,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Скелет-лучник', en: 'Skeleton Archer' },
     faction: 'necropolis',
     tier: 1,
+    growth: 30,
     hp: 6, attack: 4, defense: 1, damageMin: 1, damageMax: 3,
     ranged: true,
     counterHalved: true,
@@ -247,6 +277,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Призрак', en: 'Wight' },
     faction: 'necropolis',
     tier: 2,
+    growth: 19,
     hp: 8, attack: 3, defense: 0, damageMin: 2, damageMax: 4,
   },
   {
@@ -254,6 +285,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Дух', en: 'Wraith' },
     faction: 'necropolis',
     tier: 2,
+    growth: 19,
     hp: 8, attack: 6, defense: 0, damageMin: 2, damageMax: 4,
   },
   {
@@ -261,6 +293,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Фантом', en: 'Phantasm' },
     faction: 'necropolis',
     tier: 2,
+    growth: 19,
     hp: 8, attack: 6, defense: 4, damageMin: 2, damageMax: 4,
   },
   {
@@ -268,6 +301,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Оживший питомец', en: 'Undead Pet' },
     faction: 'necropolis',
     tier: 3,
+    growth: 14,
     hp: 14, attack: 4, defense: 6, damageMin: 3, damageMax: 5,
   },
   {
@@ -275,6 +309,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Баргест', en: 'Barghest' },
     faction: 'necropolis',
     tier: 3,
+    growth: 14,
     hp: 14, attack: 4, defense: 6, damageMin: 3, damageMax: 5,
   },
   {
@@ -282,6 +317,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Бронированная гончая', en: 'Armored Hound' },
     faction: 'necropolis',
     tier: 3,
+    growth: 14,
     hp: 18, attack: 4, defense: 8, damageMin: 3, damageMax: 5,
   },
   {
@@ -289,6 +325,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Гробокопатель', en: 'Graverobber' },
     faction: 'necropolis',
     tier: 4,
+    growth: 10,
     hp: 30, attack: 11, defense: 10, damageMin: 6, damageMax: 9,
     ranged: true,
   },
@@ -297,6 +334,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Торговец смертью', en: 'Merchant of Death' },
     faction: 'necropolis',
     tier: 4,
+    growth: 10,
     hp: 30, attack: 11, defense: 10, damageMin: 7, damageMax: 10,
     ranged: true,
   },
@@ -305,6 +343,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Псарь', en: 'Kennelmaster' },
     faction: 'necropolis',
     tier: 4,
+    growth: 10,
     hp: 30, attack: 14, defense: 10, damageMin: 6, damageMax: 9,
     ranged: true,
   },
@@ -313,6 +352,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Лич', en: 'Lich' },
     faction: 'necropolis',
     tier: 5,
+    growth: 5,
     hp: 45, attack: 12, defense: 12, damageMin: 13, damageMax: 16,
     ranged: true,
     counterHalved: true,
@@ -322,6 +362,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Чумной лич', en: 'Pestilent Lich' },
     faction: 'necropolis',
     tier: 5,
+    growth: 5,
     hp: 45, attack: 12, defense: 12, damageMin: 16, damageMax: 16,
     ranged: true,
     counterHalved: true,
@@ -331,6 +372,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Багровый лич', en: 'Sanguine Lich' },
     faction: 'necropolis',
     tier: 5,
+    growth: 5,
     hp: 45, attack: 12, defense: 16, damageMin: 13, damageMax: 16,
     ranged: true,
     counterHalved: true,
@@ -340,6 +382,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Зловещий рыцарь', en: 'Dread Knight' },
     faction: 'necropolis',
     tier: 6,
+    growth: 3,
     hp: 80, attack: 19, defense: 18, damageMin: 12, damageMax: 14,
   },
   {
@@ -347,6 +390,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Воплощение войны', en: 'Avatar of War' },
     faction: 'necropolis',
     tier: 6,
+    growth: 3,
     hp: 80, attack: 19, defense: 20, damageMin: 18, damageMax: 20,
   },
   {
@@ -354,6 +398,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пустой жнец', en: 'Hollow Reaper' },
     faction: 'necropolis',
     tier: 6,
+    growth: 3,
     hp: 80, attack: 25, defense: 18, damageMin: 24, damageMax: 26,
   },
   {
@@ -361,6 +406,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Вампир', en: 'Vampire' },
     faction: 'necropolis',
     tier: 7,
+    growth: 2,
     hp: 150, attack: 22, defense: 20, damageMin: 25, damageMax: 25,
   },
   {
@@ -368,6 +414,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Знатный вампир', en: 'Vampire Lord' },
     faction: 'necropolis',
     tier: 7,
+    growth: 2,
     hp: 175, attack: 22, defense: 26, damageMin: 30, damageMax: 30,
   },
   {
@@ -375,6 +422,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Учёный вампир', en: 'Vampire Scholar' },
     faction: 'necropolis',
     tier: 7,
+    growth: 2,
     hp: 150, attack: 27, defense: 20, damageMin: 30, damageMax: 30,
     ranged: true,
   },
@@ -385,6 +433,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Фавн', en: 'Faun' },
     faction: 'grove',
     tier: 1,
+    growth: 13,
     hp: 11, attack: 4, defense: 3, damageMin: 3, damageMax: 5,
     ranged: true,
     counterHalved: true,
@@ -394,6 +443,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Фавн-лучница', en: 'Faun Archer' },
     faction: 'grove',
     tier: 1,
+    growth: 13,
     hp: 11, attack: 4, defense: 3, damageMin: 3, damageMax: 5,
     ranged: true,
     counterHalved: true,
@@ -403,6 +453,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Фавн-мечница', en: 'Faun Warrior' },
     faction: 'grove',
     tier: 1,
+    growth: 13,
     hp: 11, attack: 6, defense: 6, damageMin: 4, damageMax: 6,
   },
   {
@@ -410,6 +461,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Хмелёк', en: 'Hoplet' },
     faction: 'grove',
     tier: 2,
+    growth: 9,
     hp: 18, attack: 6, defense: 5, damageMin: 4, damageMax: 8,
   },
   {
@@ -417,6 +469,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Рассветный хмелёк', en: 'Dawn Hoplet' },
     faction: 'grove',
     tier: 2,
+    growth: 9,
     hp: 18, attack: 9, defense: 5, damageMin: 4, damageMax: 8,
   },
   {
@@ -424,6 +477,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Закатный хмелёк', en: 'Dusk Hoplet' },
     faction: 'grove',
     tier: 2,
+    growth: 9,
     hp: 18, attack: 7, defense: 7, damageMin: 4, damageMax: 8,
   },
   {
@@ -431,6 +485,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Корневой ириад', en: 'Vine Iriyad' },
     faction: 'grove',
     tier: 3,
+    growth: 6,
     hp: 45, attack: 6, defense: 11, damageMin: 5, damageMax: 7,
   },
   {
@@ -438,6 +493,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Грибной ириад', en: 'Fungal Iriyad' },
     faction: 'grove',
     tier: 3,
+    growth: 6,
     hp: 45, attack: 6, defense: 11, damageMin: 4, damageMax: 8,
   },
   {
@@ -445,6 +501,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Кристальный ириад', en: 'Crystal Iriyad' },
     faction: 'grove',
     tier: 3,
+    growth: 6,
     hp: 45, attack: 6, defense: 11, damageMin: 5, damageMax: 7,
   },
   {
@@ -452,6 +509,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Наяда', en: 'Naiad' },
     faction: 'grove',
     tier: 4,
+    growth: 4,
     hp: 40, attack: 11, defense: 10, damageMin: 10, damageMax: 14,
     ranged: true,
     counterHalved: true,
@@ -461,6 +519,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Родниковая наяда', en: 'Vernal Naiad' },
     faction: 'grove',
     tier: 4,
+    growth: 4,
     hp: 40, attack: 11, defense: 14, damageMin: 14, damageMax: 18,
     ranged: true,
     counterHalved: true,
@@ -470,6 +529,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Ледниковая наяда', en: 'Brumal Naiad' },
     faction: 'grove',
     tier: 4,
+    growth: 4,
     hp: 40, attack: 15, defense: 10, damageMin: 14, damageMax: 18,
     ranged: true,
     counterHalved: true,
@@ -479,6 +539,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Заклинатель трав', en: 'Herbomancer' },
     faction: 'grove',
     tier: 5,
+    growth: 3,
     hp: 60, attack: 12, defense: 14, damageMin: 15, damageMax: 18,
     ranged: true,
   },
@@ -487,6 +548,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Заклинатель грибов', en: 'Sporemancer' },
     faction: 'grove',
     tier: 5,
+    growth: 3,
     hp: 60, attack: 16, defense: 18, damageMin: 15, damageMax: 18,
     ranged: true,
   },
@@ -495,6 +557,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Заклинатель шёпотов', en: 'Murmurmancer' },
     faction: 'grove',
     tier: 5,
+    growth: 3,
     hp: 60, attack: 12, defense: 14, damageMin: 18, damageMax: 18,
     ranged: true,
   },
@@ -503,6 +566,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Кирин', en: 'Qilin' },
     faction: 'grove',
     tier: 6,
+    growth: 2,
     hp: 130, attack: 22, defense: 20, damageMin: 24, damageMax: 30,
   },
   {
@@ -510,6 +574,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Громовой кирин', en: 'Thunder Qilin' },
     faction: 'grove',
     tier: 6,
+    growth: 2,
     hp: 130, attack: 22, defense: 20, damageMin: 30, damageMax: 36,
   },
   {
@@ -517,6 +582,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Туманный кирин', en: 'Mist Qilin' },
     faction: 'grove',
     tier: 6,
+    growth: 2,
     hp: 130, attack: 24, defense: 22, damageMin: 27, damageMax: 36,
   },
   {
@@ -524,6 +590,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Феникс', en: 'Phoenix' },
     faction: 'grove',
     tier: 7,
+    growth: 1,
     hp: 200, attack: 28, defense: 26, damageMin: 45, damageMax: 65,
   },
   {
@@ -531,6 +598,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пылающий феникс', en: 'Flaming Phoenix' },
     faction: 'grove',
     tier: 7,
+    growth: 1,
     hp: 300, attack: 36, defense: 27, damageMin: 45, damageMax: 65,
   },
   {
@@ -538,6 +606,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Энергетический феникс', en: 'Energy Phoenix' },
     faction: 'grove',
     tier: 7,
+    growth: 1,
     hp: 250, attack: 28, defense: 39, damageMin: 45, damageMax: 65,
   },
 
@@ -547,6 +616,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Паразит', en: 'Parasite' },
     faction: 'hive',
     tier: 1,
+    growth: 22,
     hp: 7, attack: 3, defense: 3, damageMin: 2, damageMax: 4,
     ranged: true,
   },
@@ -555,6 +625,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Паразит-смотритель', en: 'Warden Parasite' },
     faction: 'hive',
     tier: 1,
+    growth: 22,
     hp: 9, attack: 3, defense: 6, damageMin: 2, damageMax: 4,
     ranged: true,
   },
@@ -563,6 +634,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Паразит-опустошитель', en: 'Ravager Parasite' },
     faction: 'hive',
     tier: 1,
+    growth: 22,
     hp: 7, attack: 6, defense: 3, damageMin: 2, damageMax: 4,
     ranged: true,
   },
@@ -571,6 +643,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Саранча', en: 'Locust' },
     faction: 'hive',
     tier: 2,
+    growth: 14,
     hp: 12, attack: 5, defense: 4, damageMin: 3, damageMax: 5,
   },
   {
@@ -578,6 +651,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Толстая саранча', en: 'Overgrown Locust' },
     faction: 'hive',
     tier: 2,
+    growth: 14,
     hp: 16, attack: 5, defense: 4, damageMin: 3, damageMax: 5,
   },
   {
@@ -585,6 +659,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Прожорливая саранча', en: 'Harvester Locust' },
     faction: 'hive',
     tier: 2,
+    growth: 14,
     hp: 12, attack: 7, defense: 4, damageMin: 4, damageMax: 5,
   },
   {
@@ -592,6 +667,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Шершень', en: 'Hornet' },
     faction: 'hive',
     tier: 3,
+    growth: 7,
     hp: 20, attack: 7, defense: 10, damageMin: 4, damageMax: 9,
   },
   {
@@ -599,6 +675,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Поющий шершень', en: 'Chanter' },
     faction: 'hive',
     tier: 3,
+    growth: 7,
     hp: 25, attack: 7, defense: 10, damageMin: 4, damageMax: 9,
   },
   {
@@ -606,6 +683,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пронзающий шершень', en: 'Stinger' },
     faction: 'hive',
     tier: 3,
+    growth: 7,
     hp: 20, attack: 7, defense: 10, damageMin: 4, damageMax: 9,
   },
   {
@@ -613,6 +691,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Огненная личинка', en: 'Fire Larva' },
     faction: 'hive',
     tier: 4,
+    // прироста нет: личинку призывает герой, в городе её не нанимают
     hp: 16, attack: 4, defense: 4, damageMin: 4, damageMax: 4,
   },
   {
@@ -620,6 +699,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Скорпион', en: 'Scorpion' },
     faction: 'hive',
     tier: 4,
+    growth: 5,
     hp: 40, attack: 12, defense: 12, damageMin: 10, damageMax: 12,
   },
   {
@@ -627,6 +707,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Вулканический скорпион', en: 'Volcanic Scorpion' },
     faction: 'hive',
     tier: 4,
+    growth: 5,
     hp: 55, attack: 12, defense: 14, damageMin: 10, damageMax: 12,
   },
   {
@@ -634,6 +715,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Глубинный скорпион', en: 'Spelaean Scorpion' },
     faction: 'hive',
     tier: 4,
+    growth: 5,
     hp: 40, attack: 14, defense: 12, damageMin: 12, damageMax: 14,
   },
   {
@@ -641,6 +723,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Разоритель', en: 'Reaver' },
     faction: 'hive',
     tier: 5,
+    growth: 3,
     hp: 45, attack: 18, defense: 12, damageMin: 10, damageMax: 40,
   },
   {
@@ -648,6 +731,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Жуткий разоритель', en: 'Menacing Reaver' },
     faction: 'hive',
     tier: 5,
+    growth: 3,
     hp: 45, attack: 18, defense: 18, damageMin: 20, damageMax: 30,
   },
   {
@@ -655,6 +739,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Кровожадный разоритель', en: 'Maniacal Reaver' },
     faction: 'hive',
     tier: 5,
+    growth: 3,
     hp: 45, attack: 18, defense: 12, damageMin: 10, damageMax: 40,
   },
   {
@@ -662,6 +747,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Чревень', en: 'Waurms' },
     faction: 'hive',
     tier: 6,
+    growth: 2,
     hp: 120, attack: 21, defense: 21, damageMin: 21, damageMax: 23,
   },
   {
@@ -669,6 +755,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пожиратель', en: 'Devourer' },
     faction: 'hive',
     tier: 6,
+    growth: 2,
     hp: 120, attack: 21, defense: 21, damageMin: 27, damageMax: 29,
   },
   {
@@ -676,6 +763,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пироборос', en: 'Pyroboros' },
     faction: 'hive',
     tier: 6,
+    growth: 2,
     hp: 120, attack: 21, defense: 21, damageMin: 21, damageMax: 23,
     ranged: true,
     counterHalved: true,
@@ -685,6 +773,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Королева роя', en: 'Hive Queen' },
     faction: 'hive',
     tier: 7,
+    growth: 1,
     hp: 200, attack: 25, defense: 25, damageMin: 60, damageMax: 60,
   },
   {
@@ -692,6 +781,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Мать роя', en: 'Hive Mother' },
     faction: 'hive',
     tier: 7,
+    growth: 1,
     hp: 275, attack: 25, defense: 25, damageMin: 60, damageMax: 60,
   },
   {
@@ -699,6 +789,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Охотница роя', en: 'Hive Huntress' },
     faction: 'hive',
     tier: 7,
+    growth: 1,
     hp: 250, attack: 25, defense: 25, damageMin: 70, damageMax: 70,
   },
 
@@ -708,6 +799,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: "Ра'шотх", en: "Ra'Shoth" },
     faction: 'schism',
     tier: 1,
+    growth: 20,
     hp: 10, attack: 3, defense: 3, damageMin: 3, damageMax: 3,
   },
   {
@@ -715,6 +807,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: "Жалящий ра'шотх", en: "Stinging Ra'Shoth" },
     faction: 'schism',
     tier: 1,
+    growth: 20,
     hp: 10, attack: 5, defense: 5, damageMin: 3, damageMax: 3,
     ranged: true,
     counterHalved: true,
@@ -724,6 +817,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: "Свирепый ра'шотх", en: "Ferocious Ra'Shoth" },
     faction: 'schism',
     tier: 1,
+    growth: 20,
     hp: 10, attack: 3, defense: 3, damageMin: 3, damageMax: 3,
   },
   {
@@ -731,6 +825,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Культист', en: 'Cultist' },
     faction: 'schism',
     tier: 2,
+    growth: 12,
     hp: 15, attack: 5, defense: 4, damageMin: 4, damageMax: 6,
     ranged: true,
   },
@@ -739,6 +834,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Зачарователь', en: 'Binder' },
     faction: 'schism',
     tier: 2,
+    growth: 12,
     hp: 15, attack: 5, defense: 7, damageMin: 4, damageMax: 6,
     ranged: true,
   },
@@ -747,6 +843,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Служитель', en: 'Votary' },
     faction: 'schism',
     tier: 2,
+    growth: 12,
     hp: 15, attack: 9, defense: 4, damageMin: 4, damageMax: 8,
     ranged: true,
   },
@@ -755,6 +852,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: "Наездник на ага'шотхе", en: "Aga'Shoth Rider" },
     faction: 'schism',
     tier: 3,
+    growth: 8,
     hp: 20, attack: 7, defense: 7, damageMin: 5, damageMax: 7,
   },
   {
@@ -762,6 +860,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: "Укротитель ага'шотхов", en: "Aga'Shoth Tamer" },
     faction: 'schism',
     tier: 3,
+    growth: 8,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
   },
   {
@@ -769,6 +868,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: "Ага'шотх матха", en: "Aga'Shoth Mat'ha" },
     faction: 'schism',
     tier: 3,
+    growth: 8,
     hp: 25, attack: 7, defense: 7, damageMin: 5, damageMax: 7,
   },
   {
@@ -776,6 +876,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Великий шотх', en: 'Grand Shoth' },
     faction: 'schism',
     tier: 4,
+    growth: 4,
     hp: 50, attack: 11, defense: 11, damageMin: 10, damageMax: 13,
   },
   {
@@ -783,6 +884,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Невыразимый шотх', en: 'Unspeakable Shoth' },
     faction: 'schism',
     tier: 4,
+    growth: 4,
     hp: 50, attack: 11, defense: 11, damageMin: 10, damageMax: 13,
   },
   {
@@ -790,6 +892,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Немыслимый шотх', en: 'Unthinkable Shoth' },
     faction: 'schism',
     tier: 4,
+    growth: 4,
     hp: 50, attack: 11, defense: 11, damageMin: 10, damageMax: 13,
   },
   {
@@ -797,6 +900,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Конкубина', en: 'Concubus' },
     faction: 'schism',
     tier: 5,
+    growth: 3,
     hp: 60, attack: 16, defense: 13, damageMin: 14, damageMax: 20,
     ranged: true,
     counterHalved: true,
@@ -806,6 +910,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Владычица цепей', en: 'Mistress of Chains' },
     faction: 'schism',
     tier: 5,
+    growth: 3,
     hp: 60, attack: 20, defense: 13, damageMin: 14, damageMax: 20,
     ranged: true,
     counterHalved: true,
@@ -815,6 +920,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Чаровница', en: 'Bewitcher' },
     faction: 'schism',
     tier: 5,
+    growth: 3,
     hp: 60, attack: 16, defense: 13, damageMin: 20, damageMax: 20,
     ranged: true,
     counterHalved: true,
@@ -824,6 +930,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Арбитр', en: 'Arbitrator' },
     faction: 'schism',
     tier: 6,
+    growth: 2,
     hp: 75, attack: 20, defense: 20, damageMin: 18, damageMax: 22,
     ranged: true,
     counterHalved: true,
@@ -833,6 +940,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Арбитр Разлома', en: 'Rift Arbitrator' },
     faction: 'schism',
     tier: 6,
+    growth: 2,
     hp: 75, attack: 26, defense: 28, damageMin: 18, damageMax: 22,
     ranged: true,
     counterHalved: true,
@@ -842,6 +950,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Вздувшийся арбитр', en: 'Bloated Arbitrator' },
     faction: 'schism',
     tier: 6,
+    growth: 2,
     hp: 75, attack: 28, defense: 22, damageMin: 22, damageMax: 26,
     ranged: true,
     counterHalved: true,
@@ -851,6 +960,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Посланник Бездны', en: 'Abyssal Envoy' },
     faction: 'schism',
     tier: 7,
+    growth: 1,
     hp: 250, attack: 30, defense: 30, damageMin: 40, damageMax: 60,
   },
   {
@@ -858,6 +968,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Надзиратель Бездны', en: 'Abyssal Overseer' },
     faction: 'schism',
     tier: 7,
+    growth: 1,
     hp: 250, attack: 40, defense: 40, damageMin: 40, damageMax: 60,
   },
   {
@@ -865,6 +976,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Каратель Бездны', en: 'Abyssal Executor' },
     faction: 'schism',
     tier: 7,
+    growth: 1,
     hp: 250, attack: 35, defense: 35, damageMin: 60, damageMax: 60,
   },
 
@@ -874,6 +986,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Троглодит', en: 'Troglodyte' },
     faction: 'dungeon',
     tier: 1,
+    growth: 27,
     hp: 8, attack: 2, defense: 3, damageMin: 1, damageMax: 3,
   },
   {
@@ -881,6 +994,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Адский троглодит', en: 'Infernal Troglodyte' },
     faction: 'dungeon',
     tier: 1,
+    growth: 27,
     hp: 8, attack: 3, defense: 6, damageMin: 1, damageMax: 3,
   },
   {
@@ -888,6 +1002,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Ядовитый троглодит', en: 'Toxic Troglodyte' },
     faction: 'dungeon',
     tier: 1,
+    growth: 27,
     hp: 8, attack: 5, defense: 3, damageMin: 1, damageMax: 4,
   },
   {
@@ -895,6 +1010,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Лазутчик', en: 'Infiltrator' },
     faction: 'dungeon',
     tier: 2,
+    growth: 13,
     hp: 13, attack: 6, defense: 4, damageMin: 3, damageMax: 6,
   },
   {
@@ -902,6 +1018,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Коварный лазутчик', en: 'Guile Infiltrator' },
     faction: 'dungeon',
     tier: 2,
+    growth: 13,
     hp: 13, attack: 6, defense: 4, damageMin: 3, damageMax: 6,
   },
   {
@@ -909,6 +1026,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Мрачный лазутчик', en: 'Bleak Infiltrator' },
     faction: 'dungeon',
     tier: 2,
+    growth: 13,
     hp: 13, attack: 6, defense: 4, damageMin: 3, damageMax: 6,
   },
   {
@@ -916,6 +1034,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Ониксовая танцовщица', en: 'Onyx Dancer' },
     faction: 'dungeon',
     tier: 3,
+    growth: 8,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
     ranged: true,
     counterHalved: true,
@@ -925,6 +1044,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Яшмовая танцовщица', en: 'Jasper Dancer' },
     faction: 'dungeon',
     tier: 3,
+    growth: 8,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
     ranged: true,
     counterHalved: true,
@@ -934,6 +1054,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Золотая танцовщица', en: 'Aureate Dancer' },
     faction: 'dungeon',
     tier: 3,
+    growth: 8,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
     ranged: true,
     counterHalved: true,
@@ -943,6 +1064,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Минотавр', en: 'Minotaur' },
     faction: 'dungeon',
     tier: 4,
+    growth: 5,
     hp: 40, attack: 11, defense: 11, damageMin: 12, damageMax: 14,
   },
   {
@@ -950,6 +1072,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Минотавр-лорд', en: 'Minotaur Lord' },
     faction: 'dungeon',
     tier: 4,
+    growth: 5,
     hp: 40, attack: 11, defense: 15, damageMin: 12, damageMax: 14,
   },
   {
@@ -957,6 +1080,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Авангард минотавров', en: 'Minotaur Vanguard' },
     faction: 'dungeon',
     tier: 4,
+    growth: 5,
     hp: 40, attack: 15, defense: 11, damageMin: 14, damageMax: 16,
   },
   {
@@ -964,6 +1088,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Медуза', en: 'Medusa' },
     faction: 'dungeon',
     tier: 5,
+    growth: 3,
     hp: 55, attack: 15, defense: 14, damageMin: 11, damageMax: 15,
     ranged: true,
     counterHalved: true,
@@ -973,6 +1098,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Медуза-скульптор', en: 'Medusa Sculptor' },
     faction: 'dungeon',
     tier: 5,
+    growth: 3,
     hp: 55, attack: 20, defense: 18, damageMin: 15, damageMax: 15,
     ranged: true,
     counterHalved: true,
@@ -982,6 +1108,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Королева-медуза', en: 'Medusa Queen' },
     faction: 'dungeon',
     tier: 5,
+    growth: 3,
     hp: 55, attack: 17, defense: 14, damageMin: 11, damageMax: 15,
     ranged: true,
     counterHalved: true,
@@ -991,6 +1118,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Гидра', en: 'Hydra' },
     faction: 'dungeon',
     tier: 6,
+    growth: 2,
     hp: 130, attack: 24, defense: 22, damageMin: 25, damageMax: 28,
   },
   {
@@ -998,6 +1126,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Хтоническая гидра', en: 'Chthonic Hydra' },
     faction: 'dungeon',
     tier: 6,
+    growth: 2,
     hp: 160, attack: 24, defense: 30, damageMin: 25, damageMax: 28,
   },
   {
@@ -1005,6 +1134,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Адская гидра', en: 'Infernal Hydra' },
     faction: 'dungeon',
     tier: 6,
+    growth: 2,
     hp: 130, attack: 30, defense: 26, damageMin: 30, damageMax: 38,
   },
   {
@@ -1012,6 +1142,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пещерный дракон', en: 'Cave Dragon' },
     faction: 'dungeon',
     tier: 7,
+    growth: 1,
     hp: 275, attack: 29, defense: 25, damageMin: 50, damageMax: 60,
   },
   {
@@ -1019,6 +1150,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Чёрный дракон', en: 'Black Dragon' },
     faction: 'dungeon',
     tier: 7,
+    growth: 1,
     hp: 350, attack: 29, defense: 32, damageMin: 65, damageMax: 75,
   },
   {
@@ -1026,10 +1158,11 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     name: { ru: 'Пепельный дракон', en: 'Ashen Dragon' },
     faction: 'dungeon',
     tier: 7,
+    growth: 1,
     hp: 300, attack: 37, defense: 25, damageMin: 65, damageMax: 75,
   },
 
-  // Нейтральные
+  // Нейтральные — прироста нет: их не нанимают в городе
   {
     id: 'pixie',
     name: { ru: 'Пикси', en: 'Pixie' },

@@ -42,4 +42,28 @@ describe('справочник существ', () => {
 
     expect(broken.map((c) => c.id)).toEqual([])
   })
+
+  test('прирост — целое больше нуля и одинаковый у существ одного ранга во фракции', () => {
+    const firstInTier = new Map<string, number>()
+
+    const broken = CREATURE_TEMPLATES.filter((c) => {
+      if (c.growth === undefined) return false
+      if (!Number.isInteger(c.growth) || c.growth < 1) return true
+
+      const key = `${c.faction} ${c.tier}`
+      if (!firstInTier.has(key)) firstInTier.set(key, c.growth)
+      return c.growth !== firstInTier.get(key)
+    })
+
+    expect(broken.map((c) => c.id)).toEqual([])
+  })
+
+  test('прирост есть у всех существ фракций', () => {
+    // Нейтралов и Огненную личинку — её призывает герой — в городе не нанимают
+    const missing = CREATURE_TEMPLATES.filter(
+      (c) => c.faction !== 'neutral' && c.id !== 'firelarva' && c.growth === undefined,
+    )
+
+    expect(missing.map((c) => c.id)).toEqual([])
+  })
 })
