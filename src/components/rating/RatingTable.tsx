@@ -1,6 +1,7 @@
 import type { Metric } from '../../domain/types'
 import { lang, t } from '../../i18n'
 import type { RatingSort, SortKey } from '../../state/ratingTransitions'
+import { creatureIcon } from '../creatureIcons'
 import {
   formatGrowth,
   formatIndex,
@@ -64,7 +65,10 @@ export function RatingTable({ groups, metric, weekly, sort, onSort, labelledBy }
   const columns = columnsOf(weekly)
 
   return (
-    <table className="rating-table" aria-labelledby={labelledBy}>
+    <table
+      className={'rating-table' + (weekly ? ' rating-table--weekly' : '')}
+      aria-labelledby={labelledBy}
+    >
       {groups.map(({ tier, rows }) => (
         <tbody key={tier} className="rating-table__group">
           <tr>
@@ -133,6 +137,7 @@ function Row({
   const faction = factionName(creature.faction)
   const used = USED_STATS[metric]
   const shift = placeShift(entry.place, entry.soloPlace)
+  const icon = creatureIcon(creature.id)
 
   return (
     <tr>
@@ -148,10 +153,17 @@ function Row({
       </td>
 
       <td className="rating-table__cell rating-table__cell--name">
-        <span className="rating-table__name">{creature.name[lang]}</span>
-        {/* английское имя — подсказка тем, кто играет на английском */}
-        {lang !== 'en' && <span className="rating-table__name-en">{creature.name.en}</span>}
-        <span className="rating-table__meta">{metaLine(creature, faction, metric, weekly)}</span>
+        <span className="rating-table__creature">
+          {/* имя рядом, поэтому alt пустой; lazy — пока экран скрыт или строка
+              далеко внизу, картинка не грузится */}
+          {icon && <img className="rating-table__icon" src={icon} alt="" loading="lazy" />}
+          <span className="rating-table__names">
+            <span className="rating-table__name">{creature.name[lang]}</span>
+            {/* английское имя — подсказка тем, кто играет на английском */}
+            {lang !== 'en' && <span className="rating-table__name-en">{creature.name.en}</span>}
+            <span className="rating-table__meta">{metaLine(creature, faction, metric, weekly)}</span>
+          </span>
+        </span>
       </td>
 
       <td className="rating-table__cell rating-table__cell--faction">{faction}</td>

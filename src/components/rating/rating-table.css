@@ -2,6 +2,7 @@
    rating-table — таблица рейтинга: блок на каждый ранг,
    в блоке — строка ранга, заголовки столбцов и существа.
    Цвет категории — --metric-accent от блока rating.
+   Модификатор --weekly — учитывается прирост: столбцов больше.
    ============================================================ */
 
 .rating-table {
@@ -120,6 +121,19 @@
   color: var(--color-attacker);
 }
 
+/* Существо: иконка слева от подписей */
+.rating-table__creature {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+}
+
+.rating-table__icon {
+  width: 40px;
+  height: 40px;
+}
+
 .rating-table__name {
   display: block;
   font-size: 16px;
@@ -204,6 +218,23 @@
   color: var(--color-text-number);
 }
 
+/* С приростом столбцов на два больше, и имени с иконкой не хватало места —
+   длинные имена переносились. Характеристики здесь стоят плотнее, а столбец
+   доли уже: полоска остаётся не короче 40px. На узком экране эти столбцы
+   спрятаны, и правило ничего не меняет */
+.rating-table--weekly .rating-table__head--stat,
+.rating-table--weekly .rating-table__cell--stat,
+.rating-table--weekly .rating-table__head--growth,
+.rating-table--weekly .rating-table__cell--growth {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.rating-table--weekly .rating-table__head--percent,
+.rating-table--weekly .rating-table__cell--percent {
+  width: 120px;
+}
+
 /* «Поштучно» — место без учёта прироста и сдвиг: ▲ поднялось, ▼ опустилось */
 .rating-table__solo {
   display: flex;
@@ -269,6 +300,25 @@
   /* строки в две строки — первые строки ячеек встают на одну линию */
   .rating-table__cell {
     vertical-align: baseline;
+  }
+
+  /* подписи здесь в две-три строки — иконка поменьше и у первой из них */
+  .rating-table__creature {
+    grid-template-columns: 32px minmax(0, 1fr);
+    align-items: start;
+    column-gap: 10px;
+  }
+
+  /* Сетка отдаёт ячейке базовую линию своего первого столбца — иконки,
+     и имя встало бы выше места и индекса. Подписи, выровненные по базовой
+     линии, забирают её себе: теперь линию ячейки задаёт первая строка имени */
+  .rating-table__names {
+    align-self: baseline;
+  }
+
+  .rating-table__icon {
+    width: 32px;
+    height: 32px;
   }
 
   /* индекс теперь последний видимый столбец */
