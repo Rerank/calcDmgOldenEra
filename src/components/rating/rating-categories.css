@@ -1,0 +1,37 @@
+/* ============================================================
+   rating-categories — выбор категории: три карточки в ряд
+   (rating-category) и описание выбранной на узком экране.
+   ============================================================ */
+
+.rating-categories__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Описание выбранной категории — под плитками и только на узком экране:
+   там плитки сжимаются до значка и названия */
+.rating-categories__hint {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .rating-categories__list {
+    gap: 8px;
+  }
+
+  .rating-categories__hint {
+    display: block;
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--color-text-label);
+  }
+}
+
+@media (max-width: 600px) {
+  .rating-categories__hint {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+}

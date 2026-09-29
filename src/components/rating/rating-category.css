@@ -1,0 +1,109 @@
+/* ============================================================
+   rating-category — карточка категории: значок, название,
+   описание. Модификатор — своя метрика карточки: --damage,
+   --hardiness, --power; --active — выбранная.
+   ============================================================ */
+
+/* Своя метрика у каждой карточки — независимо от выбранной категории */
+.rating-category--damage {
+  --metric-accent: var(--color-attacker);
+}
+
+.rating-category--hardiness {
+  --metric-accent: var(--color-defender);
+}
+
+.rating-category--power {
+  --metric-accent: var(--color-power);
+}
+
+.rating-category {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 18px 18px;
+  text-align: left;
+  background-color: var(--color-control);
+  border: 1px solid var(--color-border);
+  transition: background-color 0.12s ease;
+}
+
+.rating-category:hover {
+  background-color: var(--color-control-hover);
+}
+
+.rating-category__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-category__icon {
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+}
+
+.rating-category__title {
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-text-muted);
+}
+
+.rating-category__desc {
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--color-text-label);
+}
+
+/* Выбранная: фон панели, рамка 2px цветом метрики и тень. Отбивки
+   меньше на 1px — рамка толще на столько же, и размер плитки не меняется.
+   На ховер выбранная не реагирует — выбирать её незачем */
+.rating-category--active,
+.rating-category--active:hover {
+  padding: 15px 17px 17px;
+  background-color: var(--color-panel);
+  border: 2px solid var(--metric-accent);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-shadow-accent);
+}
+
+.rating-category--active .rating-category__title {
+  color: var(--metric-accent);
+}
+
+/* Узкий экран: три плитки в ряд — только значок и название. Описание
+   выбранной показывает rating-categories__hint под ними */
+@media (max-width: 900px) {
+  .rating-category {
+    align-items: center;
+    gap: 0;
+    padding: 10px 6px 11px;
+  }
+
+  .rating-category--active,
+  .rating-category--active:hover {
+    padding: 9px 5px 10px;
+  }
+
+  .rating-category__head {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .rating-category__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .rating-category__title {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .rating-category__desc {
+    display: none;
+  }
+}

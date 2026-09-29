@@ -1,0 +1,108 @@
+/* ============================================================
+   rating-filters — фильтры рейтинга: ранг, фракция и
+   «Учитывать прирост».
+
+   Фон, рамку и тень даёт result-panel (микс классов в разметке).
+   ============================================================ */
+
+.rating-filters {
+  display: flex;
+  flex-direction: column;
+  padding: 12px var(--panel-padding-x);
+}
+
+.rating-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 0;
+  border-bottom: 1px dotted var(--color-divider-dot);
+}
+
+.rating-filters__row:last-child {
+  padding: 10px 0 8px;
+  border-bottom: 0;
+}
+
+/* Подпись группы — как «Шаблон» и «Герой» в калькуляторе */
+.rating-filters__label {
+  width: 96px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-meta);
+}
+
+/* Кнопки выбора — Button small; выбранная — без quiet, красная */
+.rating-filters__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.rating-filters__toggle-label {
+  font-size: 16px;
+  color: var(--color-text-label);
+  cursor: pointer;
+}
+
+.rating-filters__hint {
+  flex: 1 1 280px;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+/* До 900px страница не шире 560px: подпись встаёт над кнопками —
+   слева она отняла бы у них пятую часть строки */
+@media (max-width: 900px) {
+  .rating-filters__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* строка прироста остаётся строкой: тумблер и подпись рядом,
+     пояснение — под ними */
+  .rating-filters__row--toggle {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px 12px;
+  }
+
+  .rating-filters__label {
+    width: auto;
+  }
+
+  /* в столбце flex-basis задал бы высоту, а не ширину */
+  .rating-filters__chips {
+    flex: none;
+    width: 100%;
+  }
+
+  .rating-filters__hint {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  /* кнопки с отбивками поуже — все восемь рангов встают в одну строку
+     даже на самом узком экране, 360px */
+  .rating-filters__chips .button--small {
+    padding: 0 8px;
+  }
+
+  .rating-filters__toggle-label {
+    font-size: 15px;
+  }
+
+  .rating-filters__hint {
+    font-size: 13px;
+  }
+}
