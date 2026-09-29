@@ -37,6 +37,9 @@ export const RATING_FACTIONS = FACTIONS.filter((faction) =>
   RATED_CREATURES.some((creature) => creature.faction === faction.id),
 )
 
+/** Выбор фильтра для расчёта: пустой — это «Все», то есть ограничения нет. */
+const selected = <T>(values: T[]) => (values.length > 0 ? values : undefined)
+
 /**
  * Состояние экрана рейтинга. Как и у армий, это useState за фасадом хука,
  * а правила правок — чистые функции в ratingTransitions.ts.
@@ -56,8 +59,14 @@ export function useRating() {
     creatures,
     /** места и доли существ — в том же порядке, что creatures */
     entries,
-    /** сводка по фракциям: следует за категорией, видом и приростом, но не за рангом и фракцией */
-    summary: factionSummary(creatures, entries),
+    /**
+     * Сводка по фракциям: следует за категорией, видом и приростом, а ранг
+     * и фракция выбирают её столбцы и строки. Пустой выбор — «Все»
+     */
+    summary: factionSummary(creatures, entries, {
+      tiers: selected(options.tiers),
+      factions: selected(options.factions),
+    }),
 
     setMetric: (metric: Metric) => setOptions((current) => transitions.setMetric(current, metric)),
     setKind: (kind: CreatureKind) => setOptions((current) => transitions.setKind(current, kind)),

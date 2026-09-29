@@ -164,6 +164,41 @@ describe('сводка по фракциям', () => {
     expect(weekly.rows[1].average).toBeCloseTo(0.5, 9)
   })
 
+  test('выбранные ранги: только их столбцы, среднее — по ним', () => {
+    // I ранг: x 10, y 5 — доли 1 и 0,5; II ранг: x 2, y 4 — 0,5 и 1; III ранг: как I
+    const pool = [
+      unit(1, 'x', 10),
+      unit(1, 'y', 5),
+      unit(2, 'x', 2),
+      unit(2, 'y', 4),
+      unit(3, 'x', 10),
+      unit(3, 'y', 5),
+    ]
+    const entries = rateUnits(pool, 'damage', false)
+
+    // все ранги: x (1 + 0,5 + 1) / 3 ≈ 0,833 — первая
+    expect(factionSummary(pool, entries).rows[0].faction).toBe('x')
+
+    // только II ранг: доли те же, но теперь впереди y
+    const second = factionSummary(pool, entries, { tiers: [2] })
+    expect(second.tiers).toEqual([2])
+    expect(second.rows.map((row) => [row.faction, row.average])).toEqual([
+      ['y', 1],
+      ['x', 0.5],
+    ])
+  })
+
+  test('выбранные фракции: доли — от лидера всего ранга, лучшая и худшая — среди показанных', () => {
+    // лидер I ранга — z (20), он скрыт: у x 10 / 20 = 0,5, у y 5 / 20 = 0,25
+    const pool = [unit(1, 'x', 10), unit(1, 'y', 5), unit(1, 'z', 20)]
+    const entries = rateUnits(pool, 'damage', false)
+    const summary = factionSummary(pool, entries, { factions: ['x', 'y'] })
+
+    expect(summary.rows.map((row) => row.faction)).toEqual(['x', 'y'])
+    expect(summary.rows[0].cells[0]).toEqual({ share: 0.5, best: true, worst: false })
+    expect(summary.rows[1].cells[0]).toEqual({ share: 0.25, best: false, worst: true })
+  })
+
   test('все равны — все лучшие, худших нет; при равном среднем порядок исходный', () => {
     const pool = [unit(1, 'x', 7), unit(1, 'y', 7)]
     const summary = factionSummary(pool, rateUnits(pool, 'damage', false))

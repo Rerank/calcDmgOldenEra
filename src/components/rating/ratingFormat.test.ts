@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import type { FactionId } from '../../data/creatures'
 import { factionSummary, rateUnits } from '../../domain/rating'
+import type { SummaryFilter } from '../../domain/types'
 import type { RatedCreature } from '../../state/rating'
 import {
   formatAverage,
@@ -97,9 +98,9 @@ describe('пример под сводкой', () => {
   })
 
   /** Пример для этих существ — по той же сводке, что увидел бы экран. */
-  const exampleFor = (creatures: RatedCreature[]) => {
+  const exampleFor = (creatures: RatedCreature[], shown: SummaryFilter = {}) => {
     const entries = rateUnits(creatures, 'damage', false)
-    return summaryExample(creatures, entries, factionSummary(creatures, entries))
+    return summaryExample(creatures, entries, factionSummary(creatures, entries, shown))
   }
 
   test('фракция примера — первая по сводке без лидера ранга, лидер назван прямо', () => {
@@ -180,6 +181,50 @@ describe('пример под сводкой', () => {
     ])
 
     expect(example).toContain('Альфа 80,0%, Бета 60,0% и Гамма 40,0% — в среднем 60,0.')
+  })
+
+  test('фракция лидера скрыта фильтром — лидер всё равно назван, пример по показанным', () => {
+    // лидер I ранга — Лидер из Роя, но в сводке только Роща и Раскол
+    const example = exampleFor(
+      [
+        creature('Лидер', 'hive', 1, 10),
+        creature('Альфа', 'grove', 1, 8),
+        creature('Бета', 'schism', 1, 4),
+        creature('Гамма', 'grove', 2, 6),
+        creature('Дельта', 'schism', 2, 3),
+        creature('Эпсилон', 'hive', 2, 6),
+      ],
+      { factions: ['grove', 'schism'] },
+    )
+
+    // у Рощи: I ранг 8 / 10 = 0,8, II ранг 6 / 6 = 1 — в среднем 0,9
+    expect(example).toBe(
+      'Например, в I ранге 100% — это лидер ранга, Лидер (Рой). ' +
+        'У фракции Роща здесь Альфа 80,0% — это и есть число в ячейке. ' +
+        '«Среднее» — то же по всем рангам: 90,0.',
+    )
+  })
+
+  test('выбраны не все ранги — пример по первому из них, «Среднее» по выбранным', () => {
+    // II ранг: Гамма 6 (лидер, Роща), Дельта 3; III ранг: Эпсилон 4, Дзета 8.
+    // У Роя по II и III рангам (0,5 + 1) / 2 = 0,75
+    const example = exampleFor(
+      [
+        creature('Альфа', 'grove', 1, 10),
+        creature('Бета', 'hive', 1, 5),
+        creature('Гамма', 'grove', 2, 6),
+        creature('Дельта', 'hive', 2, 3),
+        creature('Эпсилон', 'grove', 3, 4),
+        creature('Дзета', 'hive', 3, 8),
+      ],
+      { tiers: [2, 3] },
+    )
+
+    expect(example).toBe(
+      'Например, в II ранге 100% — это лидер ранга, Гамма (Роща). ' +
+        'У фракции Рой здесь Дельта 50,0% — это и есть число в ячейке. ' +
+        '«Среднее» — то же по выбранным рангам: 75,0.',
+    )
   })
 
   test('пустая сводка — примера нет', () => {

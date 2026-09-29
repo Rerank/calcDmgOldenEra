@@ -16,6 +16,8 @@ type Props = {
   weekly: boolean
   /** пример под сводкой: как получилось число в ячейке — см. summaryExample */
   example: string | null
+  /** выбраны не все фракции: лучшая и худшая — среди показанных, и примечание говорит об этом */
+  someFactions: boolean
 }
 
 /** Прочерк вместо доли, если у фракции нет существ этого ранга: ноль читался бы как результат. */
@@ -33,13 +35,21 @@ const cellClass = (cell: SummaryCell | null) =>
 /**
  * Сводка по фракциям: в ячейке — средний % от лидера у существ фракции
  * в ранге, справа — среднее по рангам, фракции — по нему. Следует
- * за категорией, видом существ и приростом, но не за рангом и фракцией:
- * сравнивает фракции целиком. Под таблицей — пример на живых числах.
+ * за категорией, видом существ и приростом; ранг и фракция выбирают
+ * столбцы и строки. Под таблицей — пример на живых числах.
  *
+ * Показывается, только когда сравнивать есть что, — это решает экран.
  * На узком экране ранги прокручиваются вбок, а фракция и «Среднее»
  * закреплены по краям.
  */
-export function RatingSummary({ summary, metric, kind, weekly, example }: Props) {
+export function RatingSummary({
+  summary,
+  metric,
+  kind,
+  weekly,
+  example,
+  someFactions,
+}: Props) {
   const category = t.ratingCategories[metric]
   const aside = [
     t.summaryAside,
@@ -93,7 +103,9 @@ export function RatingSummary({ summary, metric, kind, weekly, example }: Props)
       </div>
 
       <p className="rating-summary__note">
-        {[t.summaryNote, example, t.summaryBest].filter(Boolean).join(' ')}
+        {[t.summaryNote, example, someFactions ? t.summaryBestSelected : t.summaryBest]
+          .filter(Boolean)
+          .join(' ')}
       </p>
     </section>
   )

@@ -202,6 +202,12 @@ export interface SummaryRow {
   average: number
 }
 
+/** Какие ранги и фракции показать в сводке; не указано — все. */
+export interface SummaryFilter {
+  tiers?: number[]
+  factions?: string[]
+}
+
 /** Сводка по фракциям: ранги по столбцам, фракции по строкам. */
 export interface RatingSummary {
   /** ранги по возрастанию */

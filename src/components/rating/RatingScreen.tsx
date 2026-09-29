@@ -48,13 +48,18 @@ export function RatingScreen() {
           sort={options.sort}
           onSort={rating.sortBy}
         />
-        <RatingSummary
-          summary={rating.summary}
-          metric={options.metric}
-          kind={options.kind}
-          weekly={options.weekly}
-          example={summaryExample(rating.creatures, rating.entries, rating.summary)}
-        />
+        {/* Сводка сравнивает фракции по рангам: при одной фракции или одном ранге
+            сравнивать в ней нечего — всё видно в таблице */}
+        {rating.summary.rows.length > 1 && rating.summary.tiers.length > 1 && (
+          <RatingSummary
+            summary={rating.summary}
+            metric={options.metric}
+            kind={options.kind}
+            weekly={options.weekly}
+            example={summaryExample(rating.creatures, rating.entries, rating.summary)}
+            someFactions={options.factions.length > 0}
+          />
+        )}
       </main>
     </>
   )

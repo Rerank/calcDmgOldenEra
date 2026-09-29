@@ -98,7 +98,9 @@ function joinList(items: string[]) {
  *
  * Собирается из того же рейтинга, что и сводка, поэтому следует
  * за категорией, видом существ и приростом и не устареет, если поменяются
- * числа в справочнике. Существа — от сильнейшего, с долями как в таблице.
+ * числа в справочнике. Ранг и фракции — из показанных в сводке, а лидер
+ * ранга назван, даже если его фракция скрыта фильтром: 100% считаются
+ * от него. Существа — от сильнейшего, с долями как в таблице.
  * Доли округлены, а среднее посчитано по точным — пересчёт по округлённым
  * может разойтись с ним на 0,1. null — сводка пустая, показывать нечего.
  *
@@ -140,7 +142,13 @@ export function summaryExample(
       creatures: joinList(members),
       share: formatAverage(cell.share),
     }),
-    fill(t.summaryExampleAverage, { average: formatAverage(row.average) }),
+    // в сводке не все ранги рейтинга — значит, выбраны не все, и «Среднее» по выбранным
+    fill(
+      summary.tiers.length < new Set(creatures.map((creature) => creature.tier)).size
+        ? t.summaryExampleAverageSelected
+        : t.summaryExampleAverage,
+      { average: formatAverage(row.average) },
+    ),
   ].join(' ')
 }
 

@@ -288,7 +288,11 @@ export const ru = {
   /** то же, когда у фракции в ранге одно существо — при фильтре «Базовые» */
   summaryExampleSingle: 'У фракции {faction} здесь {creatures} — это и есть число в ячейке.',
   summaryExampleAverage: '«Среднее» — то же по всем рангам: {average}.',
+  /** выбраны не все ранги — «Среднее» по показанным */
+  summaryExampleAverageSelected: '«Среднее» — то же по выбранным рангам: {average}.',
   summaryBest: 'Жирным — лучшая фракция ранга.',
+  /** выбраны не все фракции — лучшая и худшая среди показанных */
+  summaryBestSelected: 'Жирным — лучшая из выбранных фракций в ранге.',
 }
 
 export type Dictionary = typeof ru

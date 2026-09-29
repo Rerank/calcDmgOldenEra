@@ -1,5 +1,12 @@
 import { indicesOf, nearlyEqual, placeAmong, shareOf } from './indices'
-import type { Metric, RatedUnit, RatingEntry, RatingSummary, SummaryCell } from './types'
+import type {
+  Metric,
+  RatedUnit,
+  RatingEntry,
+  RatingSummary,
+  SummaryCell,
+  SummaryFilter,
+} from './types'
 
 /**
  * Рейтинг существ — то же сравнение, что у армий, в другом представлении:
@@ -53,10 +60,23 @@ const mean = (values: number[]) =>
  *
  * Доли берутся из рейтинга, поэтому сводка следует за метрикой и приростом.
  * entries — рейтинг тех же существ в том же порядке.
+ *
+ * shown — какие ранги и фракции показать; не указано — все. Доли от этого
+ * не меняются: они посчитаны от лидера всего ранга. Меняются столбцы
+ * и строки, а с ними среднее — оно по показанным рангам — и лучшие
+ * с худшими — они среди показанных фракций.
  */
-export function factionSummary(units: RatedUnit[], entries: RatingEntry[]): RatingSummary {
-  const tiers = [...new Set(units.map((unit) => unit.tier))].sort((a, b) => a - b)
-  const factions = [...new Set(units.map((unit) => unit.faction))]
+export function factionSummary(
+  units: RatedUnit[],
+  entries: RatingEntry[],
+  shown: SummaryFilter = {},
+): RatingSummary {
+  const tiers = [...new Set(units.map((unit) => unit.tier))]
+    .filter((tier) => !shown.tiers || shown.tiers.includes(tier))
+    .sort((a, b) => a - b)
+  const factions = [...new Set(units.map((unit) => unit.faction))].filter(
+    (faction) => !shown.factions || shown.factions.includes(faction),
+  )
 
   // средняя доля фракции в каждом ранге; null — существ этого ранга у фракции нет
   const shares = factions.map((faction) =>
