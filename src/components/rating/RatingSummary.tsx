@@ -91,10 +91,7 @@ export function RatingSummary({ summary, metric, kind, weekly }: Props) {
         </table>
       </div>
 
-      {/* Про Некрополь — только поштучно: с приростом он уже не внизу */}
-      <p className="rating-summary__note">
-        {weekly ? t.summaryNote : `${t.summaryNote} ${t.summaryNoteSolo}`}
-      </p>
+      <p className="rating-summary__note">{t.summaryNote}</p>
     </section>
   )
 }

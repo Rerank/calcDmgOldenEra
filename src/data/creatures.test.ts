@@ -90,19 +90,4 @@ describe('справочник существ', () => {
 
     expect(broken.map((c) => c.id)).toEqual([])
   })
-
-  test('у Некрополя самый высокий прирост в каждом ранге', () => {
-    // На это опирается примечание к сводке рейтинга: summaryNoteSolo в ru.ts
-    const growthOf = (faction: string, tier: number) =>
-      CREATURE_TEMPLATES.find((c) => c.faction === faction && c.tier === tier)?.growth ?? 0
-
-    const rivals = CREATURE_TEMPLATES.filter(
-      (c) =>
-        c.faction !== 'necropolis' &&
-        c.growth !== undefined &&
-        c.growth >= growthOf('necropolis', c.tier),
-    )
-
-    expect(rivals.map((c) => c.id)).toEqual([])
-  })
 })
