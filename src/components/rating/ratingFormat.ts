@@ -88,14 +88,19 @@ function joinList(items: string[]) {
 }
 
 /**
- * Пример под сводкой — как получилось число в ячейке: первая строка
- * (сильнейшая фракция) и первый ранг. Собирается из того же рейтинга, что
- * и сводка, поэтому следует за категорией, видом существ и приростом
- * и не устареет, если поменяются числа в справочнике.
+ * Пример под сводкой: откуда берутся 100% и как получилось число в ячейке.
+ * Ранг — первый, лидер ранга назван прямо. Фракция — первая по сводке,
+ * у которой лидера ранга нет: иначе в примере все доли считались бы
+ * от существа той же фракции, и казалось бы, что 100% — это лучшее существо
+ * своей фракции. Сильнейшая фракция часто лидером и владеет, поэтому
+ * «просто первая строка» не годится, а номер строки — тоже: лидер бывает
+ * и во второй, и в третьей. Если лидеры у всех фракций — берём первую.
  *
- * Существа — от сильнейшего, с долями как в таблице. Доли округлены,
- * а среднее посчитано по точным — пересчёт по округлённым может разойтись
- * с ним на 0,1. null — сводка пустая, показывать нечего.
+ * Собирается из того же рейтинга, что и сводка, поэтому следует
+ * за категорией, видом существ и приростом и не устареет, если поменяются
+ * числа в справочнике. Существа — от сильнейшего, с долями как в таблице.
+ * Доли округлены, а среднее посчитано по точным — пересчёт по округлённым
+ * может разойтись с ним на 0,1. null — сводка пустая, показывать нечего.
  *
  * creatures и entries — рейтинг в том же порядке, по которому посчитана сводка.
  */
@@ -104,28 +109,39 @@ export function summaryExample(
   entries: RatingEntry[],
   summary: RatingSummary,
 ): string | null {
-  const [row] = summary.rows
   const [tier] = summary.tiers
+  const inTier = creatures.flatMap((creature, i) =>
+    creature.tier === tier ? [{ creature, entry: entries[i] }] : [],
+  )
+  const leaders = inTier.filter(({ entry }) => entry.place === 1)
+  // сводка отдаёт фракцию строкой — множество тоже строк
+  const leading = new Set<string>(leaders.map(({ creature }) => creature.faction))
+
+  const row = summary.rows.find((r) => !leading.has(r.faction)) ?? summary.rows[0]
   const cell = row?.cells[0]
   if (!row || !cell) return null
 
-  const members = creatures
-    .flatMap((creature, i) =>
-      creature.faction === row.faction && creature.tier === tier
-        ? [{ name: creature.name[lang], share: entries[i].share }]
-        : [],
-    )
-    .sort((a, b) => b.share - a.share)
-    .map(({ name, share }) => `${name} ${formatShare(share)}`)
+  const members = inTier
+    .filter(({ creature }) => creature.faction === row.faction)
+    .sort((a, b) => b.entry.share - a.entry.share)
+    .map(({ creature, entry }) => `${creature.name[lang]} ${formatShare(entry.share)}`)
 
-  const example = fill(members.length > 1 ? t.summaryExample : t.summaryExampleSingle, {
-    faction: factionName(row.faction),
-    tier: ROMAN[tier - 1],
-    creatures: joinList(members),
-    share: formatAverage(cell.share),
-  })
+  const leaderNames = leaders.map(
+    ({ creature }) => `${creature.name[lang]} (${factionName(creature.faction)})`,
+  )
 
-  return `${example} ${fill(t.summaryExampleAverage, { average: formatAverage(row.average) })}`
+  return [
+    fill(leaders.length > 1 ? t.summaryExampleLeaders : t.summaryExampleLeader, {
+      tier: ROMAN[tier - 1],
+      leaders: joinList(leaderNames),
+    }),
+    fill(members.length > 1 ? t.summaryExample : t.summaryExampleSingle, {
+      faction: factionName(row.faction),
+      creatures: joinList(members),
+      share: formatAverage(cell.share),
+    }),
+    fill(t.summaryExampleAverage, { average: formatAverage(row.average) }),
+  ].join(' ')
 }
 
 /**
