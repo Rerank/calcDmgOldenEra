@@ -1,4 +1,4 @@
-import type { ArmyPlaces } from '../../domain/types'
+import type { Metric } from '../../domain/types'
 import { lang, t } from '../../i18n'
 import { ROMAN } from '../roman'
 
@@ -8,7 +8,7 @@ import { ROMAN } from '../roman'
  */
 
 /** Колонки сравнения в порядке показа: в итогах армии и в таблице «Итога». */
-export const ARMY_METRICS: Array<{ key: keyof ArmyPlaces; label: string }> = [
+export const ARMY_METRICS: Array<{ key: Metric; label: string }> = [
   { key: 'damage', label: t.damageIndex },
   { key: 'hardiness', label: t.hardinessIndex },
   { key: 'power', label: t.powerIndex },
