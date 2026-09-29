@@ -4,14 +4,16 @@ import { SCREENS, screenFromPath, screenPath } from './routes'
 const BASE = '/calcDmgOldenEra/'
 
 describe('адреса экранов', () => {
-  test('корень сайта — калькулятор, army/ — сравнение армий', () => {
+  test('корень сайта — калькулятор, army/ — сравнение армий, rating/ — рейтинг существ', () => {
     expect(screenFromPath('/calcDmgOldenEra/', BASE)).toBe('calculator')
     expect(screenFromPath('/calcDmgOldenEra/army/', BASE)).toBe('army')
+    expect(screenFromPath('/calcDmgOldenEra/rating/', BASE)).toBe('rating')
   })
 
   test('адрес без слеша на конце — тот же экран', () => {
     expect(screenFromPath('/calcDmgOldenEra/army', BASE)).toBe('army')
     expect(screenFromPath('/calcDmgOldenEra/army//', BASE)).toBe('army')
+    expect(screenFromPath('/calcDmgOldenEra/rating', BASE)).toBe('rating')
   })
 
   test('неизвестный и чужой адрес — главная', () => {

@@ -4,7 +4,7 @@
  * копию index.html по адресу каждого экрана (зачем — см. там).
  */
 
-export type Screen = 'calculator' | 'army'
+export type Screen = 'calculator' | 'army' | 'rating'
 
 /**
  * Адрес экрана относительно корня сайта. Главная — калькулятор.
@@ -16,6 +16,7 @@ export type Screen = 'calculator' | 'army'
 export const ROUTES: Record<Screen, string> = {
   calculator: '',
   army: 'army/',
+  rating: 'rating/',
 }
 
 /** Экраны в порядке объявления — в этом же порядке они стоят в навигации. */

@@ -2,11 +2,12 @@ import { Activity, useEffect } from 'react'
 import { AppNav } from './components/AppNav'
 import { ArmyScreen } from './components/army/ArmyScreen'
 import { CalculatorScreen } from './components/CalculatorScreen'
+import { RatingScreen } from './components/rating/RatingScreen'
 import { t } from './i18n'
 import { useScreen } from './state/screen'
 
 /**
- * Оболочка: верхняя строка с переключателем и два экрана.
+ * Оболочка: верхняя строка с переключателем и экраны.
  *
  * Скрытый экран не размонтируется: Activity прячет его через display: none
  * и отключает его эффекты. Поэтому при переключении сохраняется всё — ввод,
@@ -31,6 +32,9 @@ export function App() {
       </Activity>
       <Activity mode={screen === 'army' ? 'visible' : 'hidden'}>
         <ArmyScreen />
+      </Activity>
+      <Activity mode={screen === 'rating' ? 'visible' : 'hidden'}>
+        <RatingScreen />
       </Activity>
     </div>
   )

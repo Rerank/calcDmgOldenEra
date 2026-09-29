@@ -66,4 +66,19 @@ describe('справочник существ', () => {
 
     expect(missing.map((c) => c.id)).toEqual([])
   })
+
+  test('в каждом ранге у каждой фракции три существа с приростом', () => {
+    // Базовое и два улучшения. На это опираются тексты рейтинга существ:
+    // «в каждом ранге — 18 существ шести фракций». Состав поменялся —
+    // поправь ratingNotes в ru.ts
+    const groups = new Map<string, number>()
+    for (const c of CREATURE_TEMPLATES.filter((c) => c.growth !== undefined)) {
+      const key = `${c.faction} ${c.tier}`
+      groups.set(key, (groups.get(key) ?? 0) + 1)
+    }
+
+    expect([...groups].filter(([, count]) => count !== 3)).toEqual([])
+    // шесть фракций в семи рангах
+    expect(groups.size).toBe(6 * 7)
+  })
 })
