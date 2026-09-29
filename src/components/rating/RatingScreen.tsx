@@ -4,6 +4,7 @@ import { AppHeader } from '../AppHeader'
 import { RatingCategories } from './RatingCategories'
 import { RatingFilters } from './RatingFilters'
 import { RatingPanel } from './RatingPanel'
+import { summaryExample } from './ratingFormat'
 import { ratingGroups } from './ratingRows'
 import { RatingSummary } from './RatingSummary'
 import './rating.css'
@@ -53,6 +54,7 @@ export function RatingScreen() {
           metric={options.metric}
           kind={options.kind}
           weekly={options.weekly}
+          example={summaryExample(rating.creatures, rating.entries, rating.summary)}
         />
       </main>
     </>

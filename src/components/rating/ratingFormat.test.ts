@@ -1,4 +1,6 @@
 import { describe, expect, test } from 'vitest'
+import type { FactionId } from '../../data/creatures'
+import { factionSummary, rateUnits } from '../../domain/rating'
 import type { RatedCreature } from '../../state/rating'
 import {
   formatAverage,
@@ -7,6 +9,7 @@ import {
   formatShare,
   metaLine,
   placeShift,
+  summaryExample,
   tierName,
 } from './ratingFormat'
 
@@ -70,5 +73,73 @@ describe('строка под именем на узком экране', () => 
     expect(metaLine(faunWarrior, 'Роща', 'power', true)).toBe(
       'Роща · ×13 · атк 6 · урон 4–6 · здор. 11 · защ. 6',
     )
+  })
+})
+
+describe('пример под сводкой', () => {
+  /** Существо, у которого индекс урона равен урону: атака 0, урон без разброса. */
+  const creature = (
+    name: string,
+    faction: FactionId,
+    tier: number,
+    damage: number,
+  ): RatedCreature => ({
+    id: name,
+    name: { ru: name, en: name },
+    faction,
+    tier,
+    growth: 1,
+    hp: 1,
+    attack: 0,
+    defense: 0,
+    damageMin: damage,
+    damageMax: damage,
+  })
+
+  /** Пример для этих существ — по той же сводке, что увидел бы экран. */
+  const exampleFor = (creatures: RatedCreature[]) => {
+    const entries = rateUnits(creatures, 'damage', false)
+    return summaryExample(creatures, entries, factionSummary(creatures, entries))
+  }
+
+  test('первая строка и первый ранг: существа от сильнейшего, их среднее и «Среднее» фракции', () => {
+    // I ранг: у Рощи 10 и 9 — доли 1 и 0,9, в среднем 0,95; у Роя 5 — 0,5.
+    // II ранг: обе по 6 — доли 1. «Среднее» Рощи (0,95 + 1) / 2 = 0,975 — она первая
+    const example = exampleFor([
+      creature('Бета', 'grove', 1, 9),
+      creature('Альфа', 'grove', 1, 10),
+      creature('Гамма', 'hive', 1, 5),
+      creature('Дельта', 'grove', 2, 6),
+      creature('Эпсилон', 'hive', 2, 6),
+    ])
+
+    expect(example).toBe(
+      'Например, Роща в I ранге: Альфа 100,0% и Бета 90,0% — в среднем 95,0. ' +
+        '«Среднее» — то же по всем рангам: 97,5.',
+    )
+  })
+
+  test('одно существо в ранге — его доля и есть число в ячейке', () => {
+    // как при фильтре «Базовые»: у фракции в ранге одно существо
+    const example = exampleFor([creature('Альфа', 'grove', 1, 10), creature('Гамма', 'hive', 1, 8)])
+
+    expect(example).toBe(
+      'Например, Роща в I ранге: Альфа 100,0% — это и есть число в ячейке. ' +
+        '«Среднее» — то же по всем рангам: 100,0.',
+    )
+  })
+
+  test('трёх существ перечисляет через запятую и «и»', () => {
+    const example = exampleFor([
+      creature('Альфа', 'grove', 1, 10),
+      creature('Бета', 'grove', 1, 8),
+      creature('Гамма', 'grove', 1, 6),
+    ])
+
+    expect(example).toContain('Альфа 100,0%, Бета 80,0% и Гамма 60,0% — в среднем 80,0.')
+  })
+
+  test('пустая сводка — примера нет', () => {
+    expect(exampleFor([])).toBeNull()
   })
 })

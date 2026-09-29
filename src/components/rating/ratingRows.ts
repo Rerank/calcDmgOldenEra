@@ -1,8 +1,8 @@
-import { FACTIONS } from '../../data/creatures'
 import type { RatingEntry } from '../../domain/types'
 import { lang } from '../../i18n'
 import type { RatedCreature } from '../../state/rating'
 import type { RatingOptions, SortKey } from '../../state/ratingTransitions'
+import { factionName } from './ratingFormat'
 
 /**
  * Строки таблицы рейтинга: фильтр, блоки по рангам и сортировка внутри
@@ -21,10 +21,6 @@ export interface RatingGroup {
   tier: number
   rows: RatingRow[]
 }
-
-/** Название фракции по id: сводка получает id строкой из расчёта, таблица — из справочника. */
-export const factionName = (id: string) =>
-  FACTIONS.find((faction) => faction.id === id)?.name[lang] ?? id
 
 const collator = new Intl.Collator(lang)
 

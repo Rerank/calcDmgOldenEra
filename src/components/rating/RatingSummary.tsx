@@ -2,8 +2,7 @@ import type { Metric, RatingSummary as Summary, SummaryCell } from '../../domain
 import { t } from '../../i18n'
 import type { CreatureKind } from '../../state/ratingTransitions'
 import { ROMAN } from '../roman'
-import { formatAverage } from './ratingFormat'
-import { factionName } from './ratingRows'
+import { factionName, formatAverage } from './ratingFormat'
 // Панель — микс с result-panel: фон, рамку, тень и шапку даёт он.
 // Импорт раньше своих стилей — свои правила должны идти после и перекрывать его.
 import '../result-panel.css'
@@ -15,6 +14,8 @@ type Props = {
   /** среди кого считана сводка — видно в шапке, если выбраны не все */
   kind: CreatureKind
   weekly: boolean
+  /** пример под сводкой: как получилось число в ячейке — см. summaryExample */
+  example: string | null
 }
 
 /** Прочерк вместо доли, если у фракции нет существ этого ранга: ноль читался бы как результат. */
@@ -32,13 +33,13 @@ const cellClass = (cell: SummaryCell | null) =>
 /**
  * Сводка по фракциям: в ячейке — средний % от лидера у существ фракции
  * в ранге, справа — среднее по рангам, фракции — по нему. Следует
- * за категорией и приростом, но не за фильтрами: сравнивает фракции
- * целиком.
+ * за категорией, видом существ и приростом, но не за рангом и фракцией:
+ * сравнивает фракции целиком. Под таблицей — пример на живых числах.
  *
  * На узком экране ранги прокручиваются вбок, а фракция и «Среднее»
  * закреплены по краям.
  */
-export function RatingSummary({ summary, metric, kind, weekly }: Props) {
+export function RatingSummary({ summary, metric, kind, weekly, example }: Props) {
   const category = t.ratingCategories[metric]
   const aside = [
     t.summaryAside,
@@ -91,7 +92,9 @@ export function RatingSummary({ summary, metric, kind, weekly }: Props) {
         </table>
       </div>
 
-      <p className="rating-summary__note">{t.summaryNote}</p>
+      <p className="rating-summary__note">
+        {[t.summaryNote, example, t.summaryBest].filter(Boolean).join(' ')}
+      </p>
     </section>
   )
 }

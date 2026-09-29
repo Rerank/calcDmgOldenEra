@@ -1,8 +1,9 @@
 import attackIcon from '../../assets/images/attack.webp'
 import defenseIcon from '../../assets/images/defense.webp'
 import powerIcon from '../../assets/images/power.webp'
-import type { Metric } from '../../domain/types'
-import { lang, t } from '../../i18n'
+import { FACTIONS } from '../../data/creatures'
+import type { Metric, RatingEntry, RatingSummary } from '../../domain/types'
+import { fill, lang, t } from '../../i18n'
 import type { RatedCreature } from '../../state/rating'
 import { ROMAN } from '../roman'
 
@@ -62,6 +63,10 @@ export const formatGrowth = (growth: number) => `×${growth}`
 export const formatStat = (creature: RatedCreature, stat: Stat) =>
   stat === 'damage' ? formatDamage(creature.damageMin, creature.damageMax) : String(creature[stat])
 
+/** Название фракции по id: сводка получает id строкой из расчёта, таблица — из справочника. */
+export const factionName = (id: string) =>
+  FACTIONS.find((faction) => faction.id === id)?.name[lang] ?? id
+
 /** «Ранг III» — строка над блоком ранга. */
 export const tierName = (tier: number) => `${t.tier} ${ROMAN[tier - 1]}`
 
@@ -74,6 +79,53 @@ export function placeShift(place: number, soloPlace: number) {
   if (shift > 0) return { text: `▲${shift}`, kind: 'up' as const }
   if (shift < 0) return { text: `▼${-shift}`, kind: 'down' as const }
   return { text: '=', kind: 'same' as const }
+}
+
+/** Перечисление через запятую и «и» перед последним: «А, Б и В». */
+function joinList(items: string[]) {
+  if (items.length < 2) return items.join('')
+  return `${items.slice(0, -1).join(', ')} ${t.and} ${items[items.length - 1]}`
+}
+
+/**
+ * Пример под сводкой — как получилось число в ячейке: первая строка
+ * (сильнейшая фракция) и первый ранг. Собирается из того же рейтинга, что
+ * и сводка, поэтому следует за категорией, видом существ и приростом
+ * и не устареет, если поменяются числа в справочнике.
+ *
+ * Существа — от сильнейшего, с долями как в таблице. Доли округлены,
+ * а среднее посчитано по точным — пересчёт по округлённым может разойтись
+ * с ним на 0,1. null — сводка пустая, показывать нечего.
+ *
+ * creatures и entries — рейтинг в том же порядке, по которому посчитана сводка.
+ */
+export function summaryExample(
+  creatures: RatedCreature[],
+  entries: RatingEntry[],
+  summary: RatingSummary,
+): string | null {
+  const [row] = summary.rows
+  const [tier] = summary.tiers
+  const cell = row?.cells[0]
+  if (!row || !cell) return null
+
+  const members = creatures
+    .flatMap((creature, i) =>
+      creature.faction === row.faction && creature.tier === tier
+        ? [{ name: creature.name[lang], share: entries[i].share }]
+        : [],
+    )
+    .sort((a, b) => b.share - a.share)
+    .map(({ name, share }) => `${name} ${formatShare(share)}`)
+
+  const example = fill(members.length > 1 ? t.summaryExample : t.summaryExampleSingle, {
+    faction: factionName(row.faction),
+    tier: ROMAN[tier - 1],
+    creatures: joinList(members),
+    share: formatAverage(cell.share),
+  })
+
+  return `${example} ${fill(t.summaryExampleAverage, { average: formatAverage(row.average) })}`
 }
 
 /**

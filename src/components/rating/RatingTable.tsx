@@ -3,6 +3,7 @@ import { lang, t } from '../../i18n'
 import type { RatingSort, SortKey } from '../../state/ratingTransitions'
 import { creatureIcon } from '../creatureIcons'
 import {
+  factionName,
   formatGrowth,
   formatIndex,
   formatShare,
@@ -13,7 +14,7 @@ import {
   tierName,
   USED_STATS,
 } from './ratingFormat'
-import { factionName, type RatingGroup, type RatingRow } from './ratingRows'
+import type { RatingGroup, RatingRow } from './ratingRows'
 import './rating-table.css'
 
 type Props = {

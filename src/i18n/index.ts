@@ -11,3 +11,12 @@ export type Lang = 'ru' | 'en'
  */
 export const lang: Lang = 'ru'
 export const t = ru
+
+/**
+ * Подставляет значения в шаблон строки: «{faction} в {tier} ранге» →
+ * «Роща в I ранге». Шаблон, а не склейка кусков: в переводе порядок слов
+ * может быть другим. Неизвестный ключ остаётся в тексте как есть — ошибку
+ * в шаблоне видно сразу.
+ */
+export const fill = (template: string, values: Record<string, string>) =>
+  template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match)
