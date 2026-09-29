@@ -1,0 +1,367 @@
+/* ============================================================
+   rating-table — таблица рейтинга: блок на каждый ранг,
+   в блоке — строка ранга, заголовки столбцов и существа.
+   Цвет категории — --metric-accent от блока rating.
+   ============================================================ */
+
+.rating-table {
+  width: 100%;
+  min-width: 840px;
+  border-collapse: collapse;
+}
+
+/* Строка с названием ранга — над каждым блоком */
+.rating-table__rank {
+  padding: 12px 20px;
+  text-align: left;
+}
+
+/* Между рангами — двойная линия, как под шапкой экрана */
+.rating-table__group + .rating-table__group .rating-table__rank {
+  padding: 14px 20px 12px;
+  border-top: 3px double var(--color-rule);
+}
+
+.rating-table__rank-name {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--metric-accent);
+}
+
+/* Заголовки столбцов повторяются в каждом блоке ранга: при прокрутке
+   длинной таблицы смысл цифр не теряется */
+.rating-table__head {
+  padding: 12px 8px 10px;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-meta);
+  border-bottom: 1px solid var(--color-divider-dot);
+  white-space: nowrap;
+}
+
+.rating-table__head--stat,
+.rating-table__head--growth,
+.rating-table__head--index {
+  text-align: right;
+}
+
+.rating-table__head--index {
+  padding-left: 16px;
+  font-weight: 700;
+  color: var(--metric-accent);
+}
+
+/* Сортирует кнопка внутри заголовка: так до неё достаёт клавиатура.
+   Набор и цвет — от заголовка */
+.rating-table__sort {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+}
+
+.rating-table__sort:hover {
+  color: var(--color-text);
+}
+
+.rating-table__head--sort-desc .rating-table__sort::after {
+  content: " ▼";
+}
+
+.rating-table__head--sort-asc .rating-table__sort::after {
+  content: " ▲";
+}
+
+.rating-table__cell {
+  padding: 9px 8px;
+  border-bottom: 1px dotted var(--color-divider-dot);
+  vertical-align: middle;
+}
+
+.rating-table__head:first-child,
+.rating-table__cell:first-child {
+  padding-left: 20px;
+}
+
+.rating-table__head:last-child,
+.rating-table__cell:last-child {
+  padding-right: 20px;
+}
+
+.rating-table__head--place,
+.rating-table__cell--place {
+  width: 52px;
+}
+
+.rating-table__place {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-meta);
+}
+
+/* 1–3 места — красными цифрами */
+.rating-table__place--top {
+  color: var(--color-attacker);
+}
+
+.rating-table__name {
+  display: block;
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--color-text);
+}
+
+.rating-table__name-en {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-meta);
+}
+
+.rating-table__cell--faction {
+  font-size: 15px;
+  color: var(--color-text-label);
+  white-space: nowrap;
+}
+
+.rating-table__cell--stat,
+.rating-table__cell--growth {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--color-text-meta);
+  white-space: nowrap;
+}
+
+/* Характеристики из формулы выбранной категории — тёмным.
+   Прирост, когда его столбец виден, участвует в расчёте всегда */
+.rating-table__cell--used {
+  color: var(--color-text);
+}
+
+.rating-table__cell--index {
+  padding-left: 16px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rating-table__value {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--metric-accent);
+}
+
+.rating-table__head--percent,
+.rating-table__cell--percent {
+  width: 150px;
+  padding-left: 12px;
+}
+
+/* Доля от лидера ранга: полоска и число. Ширину заливки задаёт разметка */
+.rating-table__share {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-table__bar {
+  flex: 1;
+  min-width: 40px;
+  height: 8px;
+  background-color: var(--color-control);
+  border: 1px solid var(--color-border);
+}
+
+.rating-table__fill {
+  display: block;
+  height: 100%;
+  background-color: var(--metric-accent);
+}
+
+.rating-table__percent {
+  min-width: 48px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-text-number);
+}
+
+/* «Поштучно» — место без учёта прироста и сдвиг: ▲ поднялось, ▼ опустилось */
+.rating-table__solo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.rating-table__solo-place {
+  min-width: 18px;
+  text-align: right;
+  color: var(--color-text-meta);
+}
+
+.rating-table__delta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-text-meta);
+}
+
+.rating-table__delta--up {
+  color: var(--color-boosted);
+}
+
+.rating-table__delta--down {
+  color: var(--color-attacker);
+}
+
+/* Только для узкого экрана — там, где их столбцы спрятаны: строка
+   под именем, доля под индексом, сдвиг места под местом */
+.rating-table__meta,
+.rating-table__share--narrow,
+.rating-table__delta--narrow {
+  display: none;
+}
+
+/* Узкий экран: таблица на 840px не поместилась бы, а прокручивать её
+   вбок — значит прятать главное, индекс, за правый край. Остаются место,
+   существо и индекс. Фракция и характеристики уходят строкой под имя,
+   доля от лидера — под индекс, «поштучно» — сдвигом под место.
+   Сортировать по спрятанным столбцам здесь нельзя */
+@media (max-width: 900px) {
+  .rating-table {
+    min-width: 0;
+  }
+
+  .rating-table__head--faction,
+  .rating-table__cell--faction,
+  .rating-table__head--stat,
+  .rating-table__cell--stat,
+  .rating-table__head--growth,
+  .rating-table__cell--growth,
+  .rating-table__head--percent,
+  .rating-table__cell--percent,
+  .rating-table__head--solo,
+  .rating-table__cell--solo,
+  .rating-table__name-en {
+    display: none;
+  }
+
+  /* строки в две строки — первые строки ячеек встают на одну линию */
+  .rating-table__cell {
+    vertical-align: baseline;
+  }
+
+  /* индекс теперь последний видимый столбец */
+  .rating-table__head--index,
+  .rating-table__cell--index {
+    padding-right: 20px;
+  }
+
+  .rating-table__meta {
+    display: block;
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--color-text-meta);
+  }
+
+  .rating-table__share--narrow {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .rating-table__share--narrow .rating-table__bar {
+    flex: 0 0 56px;
+    height: 6px;
+  }
+
+  .rating-table__share--narrow .rating-table__percent {
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .rating-table__delta--narrow {
+    display: block;
+    margin-top: 2px;
+    padding-left: 4px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .rating-table__rank {
+    padding: 10px 14px;
+  }
+
+  .rating-table__group + .rating-table__group .rating-table__rank {
+    padding: 12px 14px 10px;
+  }
+
+  .rating-table__rank-name {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+  }
+
+  .rating-table__head {
+    padding: 10px 6px 8px;
+    font-size: 10px;
+  }
+
+  .rating-table__cell {
+    padding: 8px 6px;
+  }
+
+  .rating-table__head:first-child,
+  .rating-table__cell:first-child {
+    padding-left: 14px;
+  }
+
+  .rating-table__head--index,
+  .rating-table__cell--index {
+    padding-right: 14px;
+  }
+
+  .rating-table__head--place,
+  .rating-table__cell--place {
+    width: 40px;
+  }
+
+  .rating-table__place {
+    font-size: 12px;
+  }
+
+  .rating-table__name {
+    font-size: 15px;
+  }
+
+  .rating-table__value {
+    font-size: 16px;
+  }
+
+  .rating-table__share--narrow .rating-table__bar {
+    flex-basis: 44px;
+  }
+}

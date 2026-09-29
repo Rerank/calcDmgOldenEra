@@ -1,0 +1,65 @@
+/* ============================================================
+   rating-panel — панель таблицы рейтинга: значок и заголовок
+   категории, таблица (rating-table) или пустое состояние,
+   примечание под ними.
+
+   Фон, рамку, тень и шапку даёт result-panel (микс классов
+   в разметке): панель выглядит как результаты калькулятора
+   и «Итог» армий.
+   ============================================================ */
+
+.rating-panel__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-panel__icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.rating-panel__scroll {
+  overflow-x: auto;
+}
+
+.rating-panel__empty {
+  margin: 0;
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+/* Примечание под таблицей — как расшифровка формулы у калькулятора */
+.rating-panel__note {
+  margin: 0;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-divider);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text-meta);
+}
+
+@media (max-width: 600px) {
+  .rating-panel__heading {
+    gap: 10px;
+  }
+
+  .rating-panel__icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rating-panel__empty {
+    padding: 24px 14px;
+    font-size: 15px;
+  }
+
+  .rating-panel__note {
+    padding: 12px 14px;
+    font-size: 11px;
+  }
+}

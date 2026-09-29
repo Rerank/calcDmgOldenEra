@@ -1,8 +1,10 @@
 import { t } from '../../i18n'
-import { useRating } from '../../state/rating'
+import { RATED_CREATURES, useRating } from '../../state/rating'
 import { AppHeader } from '../AppHeader'
 import { RatingCategories } from './RatingCategories'
 import { RatingFilters } from './RatingFilters'
+import { RatingPanel } from './RatingPanel'
+import { ratingGroups } from './ratingRows'
 import './rating.css'
 
 /** Экран рейтинга существ: шапка, категории, фильтры, таблица и сводка. */
@@ -35,6 +37,13 @@ export function RatingScreen() {
           onToggleFaction={rating.toggleFaction}
           onAllFactions={rating.allFactions}
           onWeeklyChange={rating.setWeekly}
+        />
+        <RatingPanel
+          metric={options.metric}
+          weekly={options.weekly}
+          groups={ratingGroups(RATED_CREATURES, rating.entries, options)}
+          sort={options.sort}
+          onSort={rating.sortBy}
         />
       </main>
     </>
