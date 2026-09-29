@@ -1,5 +1,5 @@
 import { t } from '../../i18n'
-import { RATED_CREATURES, useRating } from '../../state/rating'
+import { useRating } from '../../state/rating'
 import { AppHeader } from '../AppHeader'
 import { RatingCategories } from './RatingCategories'
 import { RatingFilters } from './RatingFilters'
@@ -37,16 +37,23 @@ export function RatingScreen() {
           onAllTiers={rating.allTiers}
           onToggleFaction={rating.toggleFaction}
           onAllFactions={rating.allFactions}
+          onKindChange={rating.setKind}
           onWeeklyChange={rating.setWeekly}
         />
         <RatingPanel
           metric={options.metric}
+          kind={options.kind}
           weekly={options.weekly}
-          groups={ratingGroups(RATED_CREATURES, rating.entries, options)}
+          groups={ratingGroups(rating.creatures, rating.entries, options)}
           sort={options.sort}
           onSort={rating.sortBy}
         />
-        <RatingSummary summary={rating.summary} metric={options.metric} weekly={options.weekly} />
+        <RatingSummary
+          summary={rating.summary}
+          metric={options.metric}
+          kind={options.kind}
+          weekly={options.weekly}
+        />
       </main>
     </>
   )

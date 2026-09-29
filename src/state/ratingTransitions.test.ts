@@ -3,6 +3,7 @@ import {
   allFactions,
   allTiers,
   DEFAULT_RATING,
+  setKind,
   setMetric,
   setWeekly,
   sortBy,
@@ -14,9 +15,10 @@ import {
 const options = (patch: Partial<RatingOptions> = {}): RatingOptions => ({ ...DEFAULT_RATING, ...patch })
 
 describe('категория', () => {
-  test('по умолчанию — урон поштучно, все ранги и фракции, по индексу ▼', () => {
+  test('по умолчанию — урон поштучно, все существа, ранги и фракции, по индексу ▼', () => {
     expect(DEFAULT_RATING).toEqual({
       metric: 'damage',
+      kind: 'all',
       tiers: [],
       factions: [],
       weekly: false,
@@ -29,6 +31,25 @@ describe('категория', () => {
 
     expect(setMetric(start, 'power').metric).toBe('power')
     expect(setMetric(start, 'damage')).toBe(start)
+  })
+})
+
+describe('вид существ: выбор ровно один', () => {
+  test('выбранный вид меняется, повторный выбор — тот же объект', () => {
+    const start = options()
+
+    expect(setKind(start, 'base').kind).toBe('base')
+    expect(setKind(setKind(start, 'base'), 'upgraded').kind).toBe('upgraded')
+    expect(setKind(start, 'all')).toBe(start)
+  })
+
+  test('вид не трогает ни фильтров, ни сортировки', () => {
+    const start = options({ tiers: [2], factions: ['hive'], sort: { key: 'name', dir: 'asc' } })
+    const next = setKind(start, 'upgraded')
+
+    expect(next.tiers).toBe(start.tiers)
+    expect(next.factions).toBe(start.factions)
+    expect(next.sort).toBe(start.sort)
   })
 })
 

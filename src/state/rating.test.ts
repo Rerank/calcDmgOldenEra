@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { RATED_CREATURES, RATING_FACTIONS, RATING_TIERS } from './rating'
+import { RATED_CREATURES, RATING_FACTIONS, RATING_TIERS, ratingPool } from './rating'
 
 describe('кто в рейтинге', () => {
   test('только существа, которых нанимают в городе: нет нейтралов и Огненной личинки', () => {
@@ -21,5 +21,28 @@ describe('кто в рейтинге', () => {
       'schism',
       'dungeon',
     ])
+  })
+})
+
+describe('вид существ', () => {
+  test('«Все» — весь рейтинг', () => {
+    expect(ratingPool('all')).toBe(RATED_CREATURES)
+  })
+
+  test('базовые и улучшенные делят рейтинг без остатка и без пересечений', () => {
+    const base = ratingPool('base')
+    const upgraded = ratingPool('upgraded')
+
+    expect(base.every((creature) => !creature.upgraded)).toBe(true)
+    expect(upgraded.every((creature) => creature.upgraded)).toBe(true)
+    expect(base.length + upgraded.length).toBe(RATED_CREATURES.length)
+  })
+
+  test('мечник — базовый, капитан стражи — его улучшение', () => {
+    const ids = (kind: 'base' | 'upgraded') => ratingPool(kind).map((creature) => creature.id)
+
+    expect(ids('base')).toContain('swordsman')
+    expect(ids('base')).not.toContain('guardcaptain')
+    expect(ids('upgraded')).toContain('guardcaptain')
   })
 })

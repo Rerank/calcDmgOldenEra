@@ -1,5 +1,6 @@
 import type { Metric, RatingSummary as Summary, SummaryCell } from '../../domain/types'
 import { t } from '../../i18n'
+import type { CreatureKind } from '../../state/ratingTransitions'
 import { ROMAN } from '../roman'
 import { formatAverage } from './ratingFormat'
 import { factionName } from './ratingRows'
@@ -11,6 +12,8 @@ import './rating-summary.css'
 type Props = {
   summary: Summary
   metric: Metric
+  /** среди кого считана сводка — видно в шапке, если выбраны не все */
+  kind: CreatureKind
   weekly: boolean
 }
 
@@ -35,16 +38,19 @@ const cellClass = (cell: SummaryCell | null) =>
  * На узком экране ранги прокручиваются вбок, а фракция и «Среднее»
  * закреплены по краям.
  */
-export function RatingSummary({ summary, metric, weekly }: Props) {
+export function RatingSummary({ summary, metric, kind, weekly }: Props) {
   const category = t.ratingCategories[metric]
+  const aside = [
+    t.summaryAside,
+    weekly ? category.summaryWeekly : category.summary,
+    ...(kind === 'all' ? [] : [t.summaryKinds[kind]]),
+  ]
 
   return (
     <section className="result-panel rating-summary">
       <header className="result-panel__header rating-summary__header">
         <h2 className="result-panel__title">{t.summaryTitle}</h2>
-        <span className="rating-summary__aside">
-          {t.summaryAside} · {weekly ? category.summaryWeekly : category.summary}
-        </span>
+        <span className="rating-summary__aside">{aside.join(' · ')}</span>
       </header>
 
       <div className="rating-summary__scroll">

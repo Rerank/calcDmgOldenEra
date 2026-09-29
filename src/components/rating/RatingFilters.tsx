@@ -2,7 +2,11 @@ import type { ReactNode } from 'react'
 import type { FactionId } from '../../data/creatures'
 import { lang, t } from '../../i18n'
 import { RATING_FACTIONS, RATING_TIERS } from '../../state/rating'
-import type { RatingOptions } from '../../state/ratingTransitions'
+import {
+  CREATURE_KINDS,
+  type CreatureKind,
+  type RatingOptions,
+} from '../../state/ratingTransitions'
 import { ROMAN } from '../roman'
 import { Button } from '../ui/Button'
 import { Toggle } from '../ui/Toggle'
@@ -17,6 +21,7 @@ type Props = {
   onAllTiers: () => void
   onToggleFaction: (faction: FactionId) => void
   onAllFactions: () => void
+  onKindChange: (kind: CreatureKind) => void
   onWeeklyChange: (weekly: boolean) => void
 }
 
@@ -27,9 +32,11 @@ const FACTION_OPTIONS = RATING_FACTIONS.map((faction) => ({
 }))
 
 /**
- * Фильтры — вторичные параметры: какие ранги и фракции показать и считать ли
- * прирост. Ранг и фракция только прячут строки — места и доли от лидера
- * по-прежнему считаются среди всех существ ранга.
+ * Фильтры — вторичные параметры: какие ранги и фракции показать, каких
+ * существ сравнивать и считать ли прирост. Ранг и фракция только прячут
+ * строки — места и доли от лидера по-прежнему считаются среди всех существ
+ * ранга. Вид существ решает, кто соревнуется: невыбранных для рейтинга
+ * будто нет.
  */
 export function RatingFilters({
   options,
@@ -37,6 +44,7 @@ export function RatingFilters({
   onAllTiers,
   onToggleFaction,
   onAllFactions,
+  onKindChange,
   onWeeklyChange,
 }: Props) {
   return (
@@ -58,6 +66,15 @@ export function RatingFilters({
         onAll={onAllFactions}
       />
 
+      {/* выбор ровно один, как у категорий */}
+      <FilterRow id="rating-kind-label" label={t.kind}>
+        {CREATURE_KINDS.map((kind) => (
+          <Chip key={kind} pressed={options.kind === kind} onClick={() => onKindChange(kind)}>
+            {t.kinds[kind]}
+          </Chip>
+        ))}
+      </FilterRow>
+
       <div className="rating-filters__row rating-filters__row--toggle">
         <Toggle id="rating-weekly" checked={options.weekly} onChange={onWeeklyChange} />
         <label className="rating-filters__toggle-label" htmlFor="rating-weekly">
@@ -69,10 +86,28 @@ export function RatingFilters({
   )
 }
 
-type ChoiceProps<T> = {
+type RowProps = {
   /** id подписи: по нему группа кнопок получает своё имя */
   id: string
   label: string
+  children: ReactNode
+}
+
+/** Строка фильтра: подпись и группа кнопок выбора. */
+function FilterRow({ id, label, children }: RowProps) {
+  return (
+    <div className="rating-filters__row">
+      <span className="rating-filters__label" id={id}>
+        {label}
+      </span>
+      <div className="rating-filters__chips" role="group" aria-labelledby={id}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+type ChoiceProps<T> = Omit<RowProps, 'children'> & {
   options: Array<{ value: T; label: string }>
   /** выбранные значения; пусто — «Все» */
   selected: T[]
@@ -94,25 +129,20 @@ function Choice<T extends string | number>({
   onAll,
 }: ChoiceProps<T>) {
   return (
-    <div className="rating-filters__row">
-      <span className="rating-filters__label" id={id}>
-        {label}
-      </span>
-      <div className="rating-filters__chips" role="group" aria-labelledby={id}>
-        <Chip pressed={selected.length === 0} onClick={onAll}>
-          {t.all}
+    <FilterRow id={id} label={label}>
+      <Chip pressed={selected.length === 0} onClick={onAll}>
+        {t.all}
+      </Chip>
+      {options.map((option) => (
+        <Chip
+          key={option.value}
+          pressed={selected.includes(option.value)}
+          onClick={() => onToggle(option.value)}
+        >
+          {option.label}
         </Chip>
-        {options.map((option) => (
-          <Chip
-            key={option.value}
-            pressed={selected.includes(option.value)}
-            onClick={() => onToggle(option.value)}
-          >
-            {option.label}
-          </Chip>
-        ))}
-      </div>
-    </div>
+      ))}
+    </FilterRow>
   )
 }
 

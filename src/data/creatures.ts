@@ -1,9 +1,10 @@
 /**
  * Справочник существ Olden Era — разовая выгрузка из таблицы.
  *
- * Здесь то, что влияет на урон, — параметры и два флага, — и недельный
- * прирост. Стоимость, инициатива, скорость, боевой дух и удача сюда
- * не попали. Умений существ в выгрузке не было, поэтому их нет и здесь.
+ * Здесь то, что влияет на урон, — параметры и два флага, — недельный
+ * прирост и признак улучшения. Стоимость, инициатива, скорость, боевой дух
+ * и удача сюда не попали. Умений существ в выгрузке не было, поэтому их нет
+ * и здесь.
  *
  * Справочник только заполняет поля панели в момент выбора шаблона.
  * Расчёт про него ничего не знает и видит лишь числа и тумблеры.
@@ -35,6 +36,12 @@ export interface CreatureTemplate {
    * их не нанимают в городе.
    */
   growth?: number
+  /**
+   * Улучшенное существо. В каждом ранге фракции — базовое существо и два
+   * улучшения на выбор; у базового флага нет. Нет его и у нейтралов
+   * с Огненной личинкой: в городе их не нанимают и не улучшают.
+   */
+  upgraded?: boolean
   hp: number
   attack: number
   defense: number
@@ -72,6 +79,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 1,
     growth: 18,
+    upgraded: true,
     hp: 12, attack: 6, defense: 5, damageMin: 2, damageMax: 3,
   },
   {
@@ -80,6 +88,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 1,
     growth: 18,
+    upgraded: true,
     hp: 15, attack: 5, defense: 8, damageMin: 2, damageMax: 3,
   },
   {
@@ -98,6 +107,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 2,
     growth: 14,
+    upgraded: true,
     hp: 10, attack: 5, defense: 3, damageMin: 3, damageMax: 4,
     ranged: true,
     counterHalved: true,
@@ -108,6 +118,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 2,
     growth: 14,
+    upgraded: true,
     hp: 10, attack: 6, defense: 3, damageMin: 3, damageMax: 4,
     ranged: true,
     counterHalved: true,
@@ -126,6 +137,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 3,
     growth: 7,
+    upgraded: true,
     hp: 30, attack: 8, defense: 6, damageMin: 5, damageMax: 9,
   },
   {
@@ -134,6 +146,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 3,
     growth: 7,
+    upgraded: true,
     hp: 30, attack: 9, defense: 10, damageMin: 7, damageMax: 7,
   },
   {
@@ -152,6 +165,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 4,
     growth: 6,
+    upgraded: true,
     hp: 35, attack: 13, defense: 16, damageMin: 11, damageMax: 11,
     ranged: true,
     counterHalved: true,
@@ -162,6 +176,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 4,
     growth: 6,
+    upgraded: true,
     hp: 35, attack: 16, defense: 13, damageMin: 11, damageMax: 18,
     ranged: true,
     counterHalved: true,
@@ -180,6 +195,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 85, attack: 12, defense: 17, damageMin: 12, damageMax: 16,
   },
   {
@@ -188,6 +204,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 85, attack: 14, defense: 22, damageMin: 12, damageMax: 16,
   },
   {
@@ -204,6 +221,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 125, attack: 20, defense: 28, damageMin: 19, damageMax: 23,
   },
   {
@@ -212,6 +230,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 90, attack: 26, defense: 24, damageMin: 23, damageMax: 33,
   },
   {
@@ -230,6 +249,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 225, attack: 35, defense: 30, damageMin: 50, damageMax: 75,
     ranged: true,
     counterHalved: true,
@@ -240,6 +260,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'temple',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 300, attack: 30, defense: 35, damageMin: 50, damageMax: 75,
     ranged: true,
     counterHalved: true,
@@ -260,6 +281,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 1,
     growth: 30,
+    upgraded: true,
     hp: 6, attack: 4, defense: 3, damageMin: 2, damageMax: 3,
   },
   {
@@ -268,6 +290,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 1,
     growth: 30,
+    upgraded: true,
     hp: 6, attack: 4, defense: 1, damageMin: 1, damageMax: 3,
     ranged: true,
     counterHalved: true,
@@ -286,6 +309,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 2,
     growth: 19,
+    upgraded: true,
     hp: 8, attack: 6, defense: 0, damageMin: 2, damageMax: 4,
   },
   {
@@ -294,6 +318,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 2,
     growth: 19,
+    upgraded: true,
     hp: 8, attack: 6, defense: 4, damageMin: 2, damageMax: 4,
   },
   {
@@ -310,6 +335,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 3,
     growth: 14,
+    upgraded: true,
     hp: 14, attack: 4, defense: 6, damageMin: 3, damageMax: 5,
   },
   {
@@ -318,6 +344,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 3,
     growth: 14,
+    upgraded: true,
     hp: 18, attack: 4, defense: 8, damageMin: 3, damageMax: 5,
   },
   {
@@ -335,6 +362,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 4,
     growth: 10,
+    upgraded: true,
     hp: 30, attack: 11, defense: 10, damageMin: 7, damageMax: 10,
     ranged: true,
   },
@@ -344,6 +372,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 4,
     growth: 10,
+    upgraded: true,
     hp: 30, attack: 14, defense: 10, damageMin: 6, damageMax: 9,
     ranged: true,
   },
@@ -363,6 +392,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 5,
     growth: 5,
+    upgraded: true,
     hp: 45, attack: 12, defense: 12, damageMin: 16, damageMax: 16,
     ranged: true,
     counterHalved: true,
@@ -373,6 +403,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 5,
     growth: 5,
+    upgraded: true,
     hp: 45, attack: 12, defense: 16, damageMin: 13, damageMax: 16,
     ranged: true,
     counterHalved: true,
@@ -391,6 +422,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 6,
     growth: 3,
+    upgraded: true,
     hp: 80, attack: 19, defense: 20, damageMin: 18, damageMax: 20,
   },
   {
@@ -399,6 +431,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 6,
     growth: 3,
+    upgraded: true,
     hp: 80, attack: 25, defense: 18, damageMin: 24, damageMax: 26,
   },
   {
@@ -415,6 +448,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 7,
     growth: 2,
+    upgraded: true,
     hp: 175, attack: 22, defense: 26, damageMin: 30, damageMax: 30,
   },
   {
@@ -423,6 +457,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'necropolis',
     tier: 7,
     growth: 2,
+    upgraded: true,
     hp: 150, attack: 27, defense: 20, damageMin: 30, damageMax: 30,
     ranged: true,
   },
@@ -444,6 +479,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 1,
     growth: 13,
+    upgraded: true,
     hp: 11, attack: 4, defense: 3, damageMin: 3, damageMax: 5,
     ranged: true,
     counterHalved: true,
@@ -454,6 +490,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 1,
     growth: 13,
+    upgraded: true,
     hp: 11, attack: 6, defense: 6, damageMin: 4, damageMax: 6,
   },
   {
@@ -470,6 +507,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 2,
     growth: 9,
+    upgraded: true,
     hp: 18, attack: 9, defense: 5, damageMin: 4, damageMax: 8,
   },
   {
@@ -478,6 +516,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 2,
     growth: 9,
+    upgraded: true,
     hp: 18, attack: 7, defense: 7, damageMin: 4, damageMax: 8,
   },
   {
@@ -494,6 +533,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 3,
     growth: 6,
+    upgraded: true,
     hp: 45, attack: 6, defense: 11, damageMin: 4, damageMax: 8,
   },
   {
@@ -502,6 +542,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 3,
     growth: 6,
+    upgraded: true,
     hp: 45, attack: 6, defense: 11, damageMin: 5, damageMax: 7,
   },
   {
@@ -520,6 +561,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 4,
     growth: 4,
+    upgraded: true,
     hp: 40, attack: 11, defense: 14, damageMin: 14, damageMax: 18,
     ranged: true,
     counterHalved: true,
@@ -530,6 +572,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 4,
     growth: 4,
+    upgraded: true,
     hp: 40, attack: 15, defense: 10, damageMin: 14, damageMax: 18,
     ranged: true,
     counterHalved: true,
@@ -549,6 +592,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 60, attack: 16, defense: 18, damageMin: 15, damageMax: 18,
     ranged: true,
   },
@@ -558,6 +602,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 60, attack: 12, defense: 14, damageMin: 18, damageMax: 18,
     ranged: true,
   },
@@ -575,6 +620,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 130, attack: 22, defense: 20, damageMin: 30, damageMax: 36,
   },
   {
@@ -583,6 +629,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 130, attack: 24, defense: 22, damageMin: 27, damageMax: 36,
   },
   {
@@ -599,6 +646,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 300, attack: 36, defense: 27, damageMin: 45, damageMax: 65,
   },
   {
@@ -607,6 +655,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'grove',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 250, attack: 28, defense: 39, damageMin: 45, damageMax: 65,
   },
 
@@ -626,6 +675,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 1,
     growth: 22,
+    upgraded: true,
     hp: 9, attack: 3, defense: 6, damageMin: 2, damageMax: 4,
     ranged: true,
   },
@@ -635,6 +685,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 1,
     growth: 22,
+    upgraded: true,
     hp: 7, attack: 6, defense: 3, damageMin: 2, damageMax: 4,
     ranged: true,
   },
@@ -652,6 +703,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 2,
     growth: 14,
+    upgraded: true,
     hp: 16, attack: 5, defense: 4, damageMin: 3, damageMax: 5,
   },
   {
@@ -660,6 +712,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 2,
     growth: 14,
+    upgraded: true,
     hp: 12, attack: 7, defense: 4, damageMin: 4, damageMax: 5,
   },
   {
@@ -676,6 +729,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 3,
     growth: 7,
+    upgraded: true,
     hp: 25, attack: 7, defense: 10, damageMin: 4, damageMax: 9,
   },
   {
@@ -684,6 +738,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 3,
     growth: 7,
+    upgraded: true,
     hp: 20, attack: 7, defense: 10, damageMin: 4, damageMax: 9,
   },
   {
@@ -708,6 +763,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 4,
     growth: 5,
+    upgraded: true,
     hp: 55, attack: 12, defense: 14, damageMin: 10, damageMax: 12,
   },
   {
@@ -716,6 +772,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 4,
     growth: 5,
+    upgraded: true,
     hp: 40, attack: 14, defense: 12, damageMin: 12, damageMax: 14,
   },
   {
@@ -732,6 +789,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 45, attack: 18, defense: 18, damageMin: 20, damageMax: 30,
   },
   {
@@ -740,6 +798,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 45, attack: 18, defense: 12, damageMin: 10, damageMax: 40,
   },
   {
@@ -756,6 +815,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 120, attack: 21, defense: 21, damageMin: 27, damageMax: 29,
   },
   {
@@ -764,6 +824,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 120, attack: 21, defense: 21, damageMin: 21, damageMax: 23,
     ranged: true,
     counterHalved: true,
@@ -782,6 +843,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 275, attack: 25, defense: 25, damageMin: 60, damageMax: 60,
   },
   {
@@ -790,6 +852,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'hive',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 250, attack: 25, defense: 25, damageMin: 70, damageMax: 70,
   },
 
@@ -808,6 +871,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 1,
     growth: 20,
+    upgraded: true,
     hp: 10, attack: 5, defense: 5, damageMin: 3, damageMax: 3,
     ranged: true,
     counterHalved: true,
@@ -818,6 +882,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 1,
     growth: 20,
+    upgraded: true,
     hp: 10, attack: 3, defense: 3, damageMin: 3, damageMax: 3,
   },
   {
@@ -835,6 +900,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 2,
     growth: 12,
+    upgraded: true,
     hp: 15, attack: 5, defense: 7, damageMin: 4, damageMax: 6,
     ranged: true,
   },
@@ -844,6 +910,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 2,
     growth: 12,
+    upgraded: true,
     hp: 15, attack: 9, defense: 4, damageMin: 4, damageMax: 8,
     ranged: true,
   },
@@ -861,6 +928,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 3,
     growth: 8,
+    upgraded: true,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
   },
   {
@@ -869,6 +937,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 3,
     growth: 8,
+    upgraded: true,
     hp: 25, attack: 7, defense: 7, damageMin: 5, damageMax: 7,
   },
   {
@@ -885,6 +954,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 4,
     growth: 4,
+    upgraded: true,
     hp: 50, attack: 11, defense: 11, damageMin: 10, damageMax: 13,
   },
   {
@@ -893,6 +963,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 4,
     growth: 4,
+    upgraded: true,
     hp: 50, attack: 11, defense: 11, damageMin: 10, damageMax: 13,
   },
   {
@@ -911,6 +982,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 60, attack: 20, defense: 13, damageMin: 14, damageMax: 20,
     ranged: true,
     counterHalved: true,
@@ -921,6 +993,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 60, attack: 16, defense: 13, damageMin: 20, damageMax: 20,
     ranged: true,
     counterHalved: true,
@@ -941,6 +1014,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 75, attack: 26, defense: 28, damageMin: 18, damageMax: 22,
     ranged: true,
     counterHalved: true,
@@ -951,6 +1025,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 75, attack: 28, defense: 22, damageMin: 22, damageMax: 26,
     ranged: true,
     counterHalved: true,
@@ -969,6 +1044,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 250, attack: 40, defense: 40, damageMin: 40, damageMax: 60,
   },
   {
@@ -977,6 +1053,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'schism',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 250, attack: 35, defense: 35, damageMin: 60, damageMax: 60,
   },
 
@@ -995,6 +1072,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 1,
     growth: 27,
+    upgraded: true,
     hp: 8, attack: 3, defense: 6, damageMin: 1, damageMax: 3,
   },
   {
@@ -1003,6 +1081,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 1,
     growth: 27,
+    upgraded: true,
     hp: 8, attack: 5, defense: 3, damageMin: 1, damageMax: 4,
   },
   {
@@ -1019,6 +1098,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 2,
     growth: 13,
+    upgraded: true,
     hp: 13, attack: 6, defense: 4, damageMin: 3, damageMax: 6,
   },
   {
@@ -1027,6 +1107,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 2,
     growth: 13,
+    upgraded: true,
     hp: 13, attack: 6, defense: 4, damageMin: 3, damageMax: 6,
   },
   {
@@ -1045,6 +1126,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 3,
     growth: 8,
+    upgraded: true,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
     ranged: true,
     counterHalved: true,
@@ -1055,6 +1137,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 3,
     growth: 8,
+    upgraded: true,
     hp: 20, attack: 8, defense: 8, damageMin: 5, damageMax: 7,
     ranged: true,
     counterHalved: true,
@@ -1073,6 +1156,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 4,
     growth: 5,
+    upgraded: true,
     hp: 40, attack: 11, defense: 15, damageMin: 12, damageMax: 14,
   },
   {
@@ -1081,6 +1165,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 4,
     growth: 5,
+    upgraded: true,
     hp: 40, attack: 15, defense: 11, damageMin: 14, damageMax: 16,
   },
   {
@@ -1099,6 +1184,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 55, attack: 20, defense: 18, damageMin: 15, damageMax: 15,
     ranged: true,
     counterHalved: true,
@@ -1109,6 +1195,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 5,
     growth: 3,
+    upgraded: true,
     hp: 55, attack: 17, defense: 14, damageMin: 11, damageMax: 15,
     ranged: true,
     counterHalved: true,
@@ -1127,6 +1214,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 160, attack: 24, defense: 30, damageMin: 25, damageMax: 28,
   },
   {
@@ -1135,6 +1223,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 6,
     growth: 2,
+    upgraded: true,
     hp: 130, attack: 30, defense: 26, damageMin: 30, damageMax: 38,
   },
   {
@@ -1151,6 +1240,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 350, attack: 29, defense: 32, damageMin: 65, damageMax: 75,
   },
   {
@@ -1159,6 +1249,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'dungeon',
     tier: 7,
     growth: 1,
+    upgraded: true,
     hp: 300, attack: 37, defense: 25, damageMin: 65, damageMax: 75,
   },
 

@@ -1,6 +1,6 @@
 import type { Metric } from '../../domain/types'
 import { t } from '../../i18n'
-import type { RatingSort, SortKey } from '../../state/ratingTransitions'
+import type { CreatureKind, RatingSort, SortKey } from '../../state/ratingTransitions'
 import { METRIC_ICONS } from './ratingFormat'
 import type { RatingGroup } from './ratingRows'
 import { RatingTable } from './RatingTable'
@@ -11,6 +11,8 @@ import './rating-panel.css'
 
 type Props = {
   metric: Metric
+  /** кто соревнуется — о нём первая фраза примечания */
+  kind: CreatureKind
   weekly: boolean
   groups: RatingGroup[]
   sort: RatingSort
@@ -24,8 +26,9 @@ const TITLE_ID = 'rating-table-title'
  * Панель рейтинга: значок и заголовок категории, таблица и примечание.
  * Выглядит как результаты калькулятора и «Итог» армий.
  */
-export function RatingPanel({ metric, weekly, groups, sort, onSort }: Props) {
+export function RatingPanel({ metric, kind, weekly, groups, sort, onSort }: Props) {
   const titles = t.ratingCategories[metric]
+  const note = [t.ratingNotePool[kind], t.ratingNote, ...(weekly ? [t.ratingNoteWeekly] : [])]
 
   return (
     <section className="result-panel rating-panel">
@@ -55,9 +58,7 @@ export function RatingPanel({ metric, weekly, groups, sort, onSort }: Props) {
         )}
       </div>
 
-      <p className="rating-panel__note">
-        {weekly ? `${t.ratingNote} ${t.ratingNoteWeekly}` : t.ratingNote}
-      </p>
+      <p className="rating-panel__note">{note.join(' ')}</p>
     </section>
   )
 }

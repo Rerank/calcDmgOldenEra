@@ -67,19 +67,28 @@ describe('справочник существ', () => {
     expect(missing.map((c) => c.id)).toEqual([])
   })
 
-  test('в каждом ранге у каждой фракции три существа с приростом', () => {
-    // Базовое и два улучшения. На это опираются тексты рейтинга существ:
-    // «в каждом ранге — 18 существ шести фракций». Состав поменялся —
-    // поправь ratingNotes и ratingNote в ru.ts
-    const groups = new Map<string, number>()
+  test('в каждом ранге у каждой фракции — базовое существо и два улучшения', () => {
+    // На это опираются тексты рейтинга существ: «в каждом ранге — 18 существ
+    // шести фракций», «среди 6 базовых», «среди 12 улучшенных». Состав
+    // поменялся — поправь ratingNotes и ratingNotePool в ru.ts
+    const groups = new Map<string, { base: number; upgraded: number }>()
     for (const c of CREATURE_TEMPLATES.filter((c) => c.growth !== undefined)) {
       const key = `${c.faction} ${c.tier}`
-      groups.set(key, (groups.get(key) ?? 0) + 1)
+      const group = groups.get(key) ?? { base: 0, upgraded: 0 }
+      group[c.upgraded ? 'upgraded' : 'base']++
+      groups.set(key, group)
     }
 
-    expect([...groups].filter(([, count]) => count !== 3)).toEqual([])
+    const broken = [...groups].filter(([, g]) => g.base !== 1 || g.upgraded !== 2)
+    expect(broken.map(([key]) => key)).toEqual([])
     // шесть фракций в семи рангах
     expect(groups.size).toBe(6 * 7)
+  })
+
+  test('улучшение отмечено только у существ, которых нанимают в городе', () => {
+    const broken = CREATURE_TEMPLATES.filter((c) => c.upgraded && c.growth === undefined)
+
+    expect(broken.map((c) => c.id)).toEqual([])
   })
 
   test('у Некрополя самый высокий прирост в каждом ранге', () => {

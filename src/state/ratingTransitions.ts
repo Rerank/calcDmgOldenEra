@@ -29,9 +29,20 @@ export interface RatingSort {
   dir: 'asc' | 'desc'
 }
 
+/**
+ * Какие существа в рейтинге: все, только базовые или только улучшенные.
+ * Невыбранных для рейтинга будто нет — см. ratingPool в rating.ts.
+ */
+export type CreatureKind = 'all' | 'base' | 'upgraded'
+
+/** Вид существ в порядке кнопок фильтра. */
+export const CREATURE_KINDS: CreatureKind[] = ['all', 'base', 'upgraded']
+
 export interface RatingOptions {
   /** категория: урон, живучесть или мощность */
   metric: Metric
+  /** кто соревнуется: в отличие от ранга и фракции, меняет места и доли */
+  kind: CreatureKind
   /** выбранные ранги; пусто — «Все» */
   tiers: number[]
   /** выбранные фракции; пусто — «Все» */
@@ -53,9 +64,10 @@ const WEEKLY_ONLY: SortKey[] = ['growth', 'solo']
 
 const DEFAULT_SORT: RatingSort = { key: 'value', dir: 'desc' }
 
-/** Экран открывается на уроне поштучно, все ранги и фракции, по индексу ▼. */
+/** Экран открывается на уроне поштучно, все существа, ранги и фракции, по индексу ▼. */
 export const DEFAULT_RATING: RatingOptions = {
   metric: 'damage',
+  kind: 'all',
   tiers: [],
   factions: [],
   weekly: false,
@@ -64,6 +76,11 @@ export const DEFAULT_RATING: RatingOptions = {
 
 export function setMetric(options: RatingOptions, metric: Metric): RatingOptions {
   return options.metric === metric ? options : { ...options, metric }
+}
+
+/** Выбор ровно один: «Все», «Базовые» или «Улучшенные». */
+export function setKind(options: RatingOptions, kind: CreatureKind): RatingOptions {
+  return options.kind === kind ? options : { ...options, kind }
 }
 
 /** Значение включается или выключается. Снятое последним — пустой выбор, то есть снова «Все». */
