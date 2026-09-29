@@ -26,7 +26,6 @@ export function RatingScreen() {
           <strong>{t.powerIndex}</strong>&nbsp;— {notes.power}
         </p>
         <p>{notes.growth}</p>
-        <p>{notes.scope}</p>
       </AppHeader>
 
       {/* Цвет выбранной категории — модификатором: его берут таблица и сводка */}
