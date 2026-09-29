@@ -1,4 +1,4 @@
-import { FACTIONS, type FactionId } from '../../data/creatures'
+import { FACTIONS } from '../../data/creatures'
 import type { RatingEntry } from '../../domain/types'
 import { lang } from '../../i18n'
 import type { RatedCreature } from '../../state/rating'
@@ -22,7 +22,8 @@ export interface RatingGroup {
   rows: RatingRow[]
 }
 
-export const factionName = (id: FactionId) =>
+/** Название фракции по id: сводка получает id строкой из расчёта, таблица — из справочника. */
+export const factionName = (id: string) =>
   FACTIONS.find((faction) => faction.id === id)?.name[lang] ?? id
 
 const collator = new Intl.Collator(lang)
