@@ -13,7 +13,7 @@ import './army-compare.css'
 
 /** Экран сравнения армий: шапка, армии и «Итог» под ними. */
 export function ArmyScreen() {
-  const { armies, stats, comparison, addArmy, removeArmy, addTroop, removeTroop, setCount } =
+  const { armies, stats, summary, addArmy, removeArmy, addTroop, removeTroop, setCount } =
     useArmies()
   const armiesRef = useRef<HTMLDivElement>(null)
 
@@ -107,11 +107,10 @@ export function ArmyScreen() {
           )}
         </div>
 
-        {/* Сравнивать есть что, только когда существа есть хотя бы в двух армиях:
-            при одной армии или одной непустой «Итога» нет */}
-        {comparison.verdict.kind !== 'none' && (
-          <ArmySummary stats={stats} comparison={comparison} />
-        )}
+        {/* Сравнивать есть что, когда существа есть хотя бы в двух армиях — тогда
+            «Итог» сравнивает армии, — или когда заполнена одна армия, но отрядов
+            в ней хотя бы два — тогда её отряды. Иначе «Итога» нет */}
+        {summary.comparison.verdict.kind !== 'none' && <ArmySummary {...summary} />}
       </main>
     </>
   )

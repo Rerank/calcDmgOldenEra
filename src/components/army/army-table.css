@@ -63,6 +63,17 @@
   color: var(--color-text-label);
 }
 
+/* Количество в отряде — строкой под именем существа, как численность
+   в шапке армии. Есть, только когда «Итог» сравнивает отряды */
+.army-table__count {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-meta);
+}
+
 /* отступ между колонками чисел — слева от каждой */
 .army-table__cell {
   padding-left: 28px;
@@ -126,6 +137,19 @@
   .army-table__label {
     padding: 10px 0;
     font-size: 14px;
+
+    /* Длинные имена существ — «Энергетический», «Бронированная» — шире
+       колонки: переносим их по слогам (язык страницы — русский), а где
+       переноса нет — рвём слово, лишь бы не вылезло на соседнюю колонку.
+       Только здесь: в широкой колонке перенос по слогам не нужен, а резал бы
+       имена там, где хватает переноса по пробелу */
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  .army-table__count {
+    font-size: 11px;
   }
 
   .army-table__cell {

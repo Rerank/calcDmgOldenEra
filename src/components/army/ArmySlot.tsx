@@ -1,11 +1,11 @@
-import { findTemplate } from '../../data/creatures'
 import { F } from '../../domain/rules'
-import { lang, t } from '../../i18n'
+import { t } from '../../i18n'
 import type { Troop } from '../../state/armyTransitions'
 import { creatureIcon } from '../creatureIcons'
 import { TEMPLATE_GROUPS } from '../templateGroups'
 import { Combobox } from '../ui/Combobox'
 import { Stepper } from '../ui/Stepper'
+import { creatureName } from './armyFormat'
 import { NARROW } from './narrow'
 import './army-slot.css'
 
@@ -47,7 +47,7 @@ export function ArmySlot({ id, troop, focusCount, onAdd, onRemove, onCountChange
     )
   }
 
-  const name = findTemplate(troop.creatureId)?.name[lang] ?? troop.creatureId
+  const name = creatureName(troop.creatureId)
   const icon = creatureIcon(troop.creatureId)
 
   return (

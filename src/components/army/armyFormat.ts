@@ -1,5 +1,7 @@
+import { findTemplate } from '../../data/creatures'
 import type { Metric } from '../../domain/types'
 import { lang, t } from '../../i18n'
+import type { Troop } from '../../state/armyTransitions'
 import { ROMAN } from '../roman'
 
 /**
@@ -22,6 +24,9 @@ export const NO_VALUE = '—'
  * следующих сдвигаются, пропусков не бывает.
  */
 export const armyName = (index: number) => `${t.army} ${ROMAN[index]}`
+
+/** Имя существа на языке интерфейса. Неизвестный id — как есть: подпись не останется пустой. */
+export const creatureName = (id: string) => findTemplate(id)?.name[lang] ?? id
 
 const INTEGER = new Intl.NumberFormat(lang, { maximumFractionDigits: 0 })
 const ONE_DIGIT = new Intl.NumberFormat(lang, { maximumSignificantDigits: 1 })
@@ -46,9 +51,16 @@ export function formatLag(share: number): string {
   return `(−${value}%)`
 }
 
-/** Номера армий перечислением: [0, 1, 2] → «I, II и III». */
-export function joinArmyNumbers(indexes: number[]): string {
-  const numbers = indexes.map((index) => ROMAN[index])
-  if (numbers.length < 2) return numbers.join('')
-  return `${numbers.slice(0, -1).join(', ')} ${t.and} ${numbers[numbers.length - 1]}`
+/**
+ * Отряд в вердикте «Итога»: «Наяда (8 шт)». Количество — часть имени:
+ * в армии бывает два отряда одного существа. Между числом и «шт» —
+ * неразрывный пробел, «шт» не оторвётся переносом строки.
+ */
+export const troopName = (troop: Troop) =>
+  `${creatureName(troop.creatureId)} (${formatInteger(troop.count)}\u00a0${t.pcs})`
+
+/** Перечисление для вердикта: [«I», «II», «III»] → «I, II и III». */
+export function joinList(items: string[]): string {
+  if (items.length < 2) return items.join('')
+  return `${items.slice(0, -1).join(', ')} ${t.and} ${items[items.length - 1]}`
 }

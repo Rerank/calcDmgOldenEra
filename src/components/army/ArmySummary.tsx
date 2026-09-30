@@ -1,12 +1,16 @@
 import type { ArmyComparison, ArmyStats, ArmyVerdict } from '../../domain/types'
 import { t } from '../../i18n'
+import type { Troop } from '../../state/armyTransitions'
+import { ROMAN } from '../roman'
 import {
   ARMY_METRICS,
   armyName,
+  creatureName,
   formatInteger,
   formatLag,
-  joinArmyNumbers,
+  joinList,
   NO_VALUE,
+  troopName,
 } from './armyFormat'
 // Панель — микс с result-panel, как и панели армий: это тот же «Итог»,
 // что в калькуляторе. Импорт раньше своих стилей — свои должны перекрывать его.
@@ -15,12 +19,16 @@ import './army-summary.css'
 import './army-table.css'
 
 type Props = {
+  /** отряды, которые сравнивает «Итог»; null — сравниваются армии */
+  troops: Troop[] | null
+  /** итоги строк — армий или отрядов, в том же порядке */
   stats: ArmyStats[]
   comparison: ArmyComparison
 }
 
 /**
- * «Итог» сравнения: вердикт в шапке и таблица армий по трём индексам.
+ * «Итог» сравнения: вердикт в шапке и таблица по трём индексам. Строки
+ * таблицы — армии, а если существа есть только в одной армии — её отряды.
  *
  * У каждого значения — полоска длиной с долю от лучшего в колонке и процент
  * отставания от него. Считаются они от одной точки, поэтому не спорят.
@@ -28,12 +36,12 @@ type Props = {
  *
  * Показывается, только когда сравнивать есть что — это решает экран.
  */
-export function ArmySummary({ stats, comparison }: Props) {
+export function ArmySummary({ troops, stats, comparison }: Props) {
   return (
     <section className="result-panel army-summary">
       <header className="result-panel__header army-summary__header">
         <h2 className="result-panel__title">{t.resultTitle}</h2>
-        <Verdict verdict={comparison.verdict} />
+        <Verdict verdict={comparison.verdict} troops={troops} />
       </header>
 
       <div className="army-summary__body">
@@ -60,11 +68,12 @@ export function ArmySummary({ stats, comparison }: Props) {
             {comparison.places.map((places, index) => {
               // пустая армия ни с кем не соревнуется: прочерк и пустая полоска
               const filled = stats[index].count > 0
+              const troop = troops?.[index]
 
               return (
                 <tr key={index}>
                   <th className="army-table__label" scope="row">
-                    {armyName(index)}
+                    {troop ? <TroopLabel troop={troop} /> : armyName(index)}
                   </th>
 
                   {ARMY_METRICS.map(({ key }) => {
@@ -99,28 +108,49 @@ export function ArmySummary({ stats, comparison }: Props) {
           </tbody>
         </table>
 
-        <p className="army-summary__note">{t.armyNote}</p>
+        <p className="army-summary__note">{troops ? t.troopNote : t.armyNote}</p>
       </div>
     </section>
   )
 }
 
-/** «Сильнейшая армия — Армия I» или «Армии I и II примерно равны». */
-function Verdict({ verdict }: { verdict: ArmyVerdict }) {
+/** Отряд в строке таблицы: имя, под ним количество — как численность в шапке армии. */
+function TroopLabel({ troop }: { troop: Troop }) {
+  return (
+    <>
+      {creatureName(troop.creatureId)}
+      <span className="army-table__count">
+        {formatInteger(troop.count)}&nbsp;{t.pcs}
+      </span>
+    </>
+  )
+}
+
+/**
+ * Армии: «Сильнейшая армия — Армия I» или «Армии I и II примерно равны».
+ * Отряды: «Сильнейший отряд — Наяда (8 шт)» или «Отряды Хмелёк (15 шт)
+ * и Наяда (8 шт) примерно равны».
+ */
+function Verdict({ verdict, troops }: { verdict: ArmyVerdict; troops: Troop[] | null }) {
   if (verdict.kind === 'leader') {
     return (
       <p className="army-summary__verdict">
-        {t.strongestArmy} <b className="army-summary__leader">{armyName(verdict.army)}</b>
+        {troops ? t.strongestTroop : t.strongestArmy}{' '}
+        <b className="army-summary__leader">
+          {troops ? troopName(troops[verdict.army]) : armyName(verdict.army)}
+        </b>
       </p>
     )
   }
 
   if (verdict.kind === 'tie') {
+    // армии после «Армии» — одними номерами, отряды — целиком, с количеством
+    const names = verdict.armies.map((index) => (troops ? troopName(troops[index]) : ROMAN[index]))
+
     return (
       <p className="army-summary__verdict">
-        {t.armiesPlural}{' '}
-        <b className="army-summary__leader">{joinArmyNumbers(verdict.armies)}</b>{' '}
-        {t.roughlyEqual}
+        {troops ? t.troopsPlural : t.armiesPlural}{' '}
+        <b className="army-summary__leader">{joinList(names)}</b> {t.roughlyEqual}
       </p>
     )
   }

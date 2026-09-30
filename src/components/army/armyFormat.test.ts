@@ -1,7 +1,16 @@
 import { describe, expect, test } from 'vitest'
+import { CREATURE_TEMPLATES } from '../../data/creatures'
 import { ARMY_RULES } from '../../domain/rules'
+import { lang } from '../../i18n'
 import { ROMAN } from '../roman'
-import { armyName, formatInteger, formatLag, joinArmyNumbers } from './armyFormat'
+import {
+  armyName,
+  creatureName,
+  formatInteger,
+  formatLag,
+  joinList,
+  troopName,
+} from './armyFormat'
 
 describe('подписи экрана армий', () => {
   test('индекс — целое, половина округляется вверх, разряды через неразрывный пробел', () => {
@@ -29,14 +38,34 @@ describe('подписи экрана армий', () => {
     expect(formatLag(0.9903)).toBe('(−1%)')
   })
 
-  test('номера армий в вердикте — перечислением через «и»', () => {
-    expect(joinArmyNumbers([0])).toBe('I')
-    expect(joinArmyNumbers([0, 1])).toBe('I и II')
-    expect(joinArmyNumbers([0, 2, 3])).toBe('I, III и IV')
+  test('перечисление в вердикте — через запятую и «и»', () => {
+    expect(joinList(['I'])).toBe('I')
+    expect(joinList(['I', 'II'])).toBe('I и II')
+    expect(joinList(['I', 'III', 'IV'])).toBe('I, III и IV')
   })
 
   test('римских цифр хватает на все армии', () => {
     // подняли предел армий выше длины ROMAN — допиши массив, иначе у армии не будет номера
     expect(ROMAN.length).toBeGreaterThanOrEqual(ARMY_RULES.maxArmies)
+  })
+})
+
+describe('подписи отрядов', () => {
+  // существо — любое из справочника: тест не завязан на его имя
+  const [creature] = CREATURE_TEMPLATES
+  const name = creature.name[lang]
+
+  test('имя существа — из справочника, неизвестный id — как есть', () => {
+    expect(creatureName(creature.id)).toBe(name)
+    expect(creatureName('nosuchcreature')).toBe('nosuchcreature')
+  })
+
+  test('отряд в вердикте — имя и количество в скобках', () => {
+    expect(troopName({ creatureId: creature.id, count: 8 })).toBe(`${name} (8\u00a0шт)`)
+  })
+
+  test('количество — с разрядами, «шт» не отрывается от числа', () => {
+    // оба пробела неразрывные: и между разрядами, и перед «шт»
+    expect(troopName({ creatureId: creature.id, count: 1500 })).toBe(`${name} (1\u00a0500\u00a0шт)`)
   })
 })
