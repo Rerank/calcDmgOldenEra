@@ -41,6 +41,7 @@ export function CalculatorScreen() {
           {notes.where}
         </p>
         <p>{notes.floor}</p>
+        <p>{notes.stacking}</p>
         <p>{notes.abilities}</p>
       </AppHeader>
 
