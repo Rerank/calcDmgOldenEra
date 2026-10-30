@@ -8,8 +8,12 @@ import type { ArmyUnit } from './types'
  *
  * Существа заданы прямо здесь, а не взяты из справочника: правка чисел
  * в справочнике не должна ломать проверку формулы. Параметры совпадают
- * с одноимёнными существами на момент написания — так примеры сверяются
+ * с одноимёнными существами до патча 0.82.06 — так примеры сверяются
  * с макетом экрана армий.
+ *
+ * K(n) — множитель от разницы атаки и защиты: K(3) = 1,1188, K(4) = 1,1576,
+ * K(6) = 1,234, K(7) = 1,2716, K(9) = 1,3456, K(11) = 1,418, K(12) = 1,4536,
+ * K(17) = 1,6256. Без противника разница — это сами атака и защита.
  */
 
 const swordsman: ArmyUnit = { hp: 12, attack: 4, defense: 4, damageMin: 2, damageMax: 3 }
@@ -24,53 +28,53 @@ const vineIriyad: ArmyUnit = { hp: 45, attack: 6, defense: 11, damageMin: 5, dam
 
 describe('индексы', () => {
   test('армия I из макета: 20 мечников, 14 грифонов, 6 кавалеристов', () => {
-    // D = 20 × 2,5 × 24/20 + 14 × 7 × 27/20 + 6 × 12 × 32/20 = 60 + 132,3 + 115,2 = 307,5
-    // H = 20 × 12 × 24/20 + 14 × 30 × 26/20 + 6 × 85 × 37/20 = 288 + 546 + 943,5 = 1777,5
-    // мощность = √(307,5 × 1777,5) = √546 581,25 ≈ 739,311
+    // D = 20 × 2,5 × K(4) + 14 × 7 × K(7) + 6 × 12 × K(12) = 57,88 + 124,6168 + 104,6592 = 287,156
+    // H = 20 × 12 × K(4) + 14 × 30 × K(6) + 6 × 85 × K(17) = 277,824 + 518,28 + 829,056 = 1625,16
+    // мощность = √(287,156 × 1625,16) ≈ 683,136
     const indices = indicesOf([
       { unit: swordsman, count: 20 },
       { unit: griffin, count: 14 },
       { unit: cavalry, count: 6 },
     ])
 
-    expect(indices.damage).toBeCloseTo(307.5, 9)
-    expect(indices.hardiness).toBeCloseTo(1777.5, 9)
-    expect(indices.power).toBeCloseTo(739.311, 3)
+    expect(indices.damage).toBeCloseTo(287.156, 9)
+    expect(indices.hardiness).toBeCloseTo(1625.16, 9)
+    expect(indices.power).toBeCloseTo(683.136, 3)
   })
 
   test('армия II из макета: 80 скелетов, 18 фантомов, 12 оживших питомцев', () => {
-    // D = 80 × 2 × 24/20 + 18 × 3 × 26/20 + 12 × 4 × 24/20 = 192 + 70,2 + 57,6 = 319,8
-    // H = 80 × 6 × 21/20 + 18 × 8 × 24/20 + 12 × 14 × 26/20 = 504 + 172,8 + 218,4 = 895,2
-    // мощность = √(319,8 × 895,2) = √286 284,96 ≈ 535,056
+    // D = 80 × 2 × K(4) + 18 × 3 × K(6) + 12 × 4 × K(4) = 185,216 + 66,636 + 55,5648 = 307,4168
+    // H = 80 × 6 × K(1) + 18 × 8 × K(4) + 12 × 14 × K(6) = 499,2 + 166,6944 + 207,312 = 873,2064
+    // мощность = √(307,4168 × 873,2064) ≈ 518,110
     const indices = indicesOf([
       { unit: skeleton, count: 80 },
       { unit: phantasm, count: 18 },
       { unit: undeadPet, count: 12 },
     ])
 
-    expect(indices.damage).toBeCloseTo(319.8, 9)
-    expect(indices.hardiness).toBeCloseTo(895.2, 9)
-    expect(indices.power).toBeCloseTo(535.056, 3)
+    expect(indices.damage).toBeCloseTo(307.4168, 9)
+    expect(indices.hardiness).toBeCloseTo(873.2064, 9)
+    expect(indices.power).toBeCloseTo(518.11, 3)
   })
 
   test('армия III из макета: 10 мечников, 30 скелетов', () => {
-    // D = 10 × 2,5 × 24/20 + 30 × 2 × 24/20 = 30 + 72 = 102
-    // H = 10 × 12 × 24/20 + 30 × 6 × 21/20 = 144 + 189 = 333
-    // мощность = √(102 × 333) = √33 966 ≈ 184,299
+    // D = 10 × 2,5 × K(4) + 30 × 2 × K(4) = 28,94 + 69,456 = 98,396
+    // H = 10 × 12 × K(4) + 30 × 6 × K(1) = 138,912 + 187,2 = 326,112
+    // мощность = √(98,396 × 326,112) ≈ 179,132
     const indices = indicesOf([
       { unit: swordsman, count: 10 },
       { unit: skeleton, count: 30 },
     ])
 
-    expect(indices.damage).toBeCloseTo(102, 9)
-    expect(indices.hardiness).toBeCloseTo(333, 9)
-    expect(indices.power).toBeCloseTo(184.299, 3)
+    expect(indices.damage).toBeCloseTo(98.396, 9)
+    expect(indices.hardiness).toBeCloseTo(326.112, 9)
+    expect(indices.power).toBeCloseTo(179.132, 3)
   })
 
-  test('было / стало: после потерь и найма армия стала слабее на 1,2%', () => {
+  test('было / стало: после потерь и найма армия стала слабее на 1%', () => {
     // Было: 13 фавнов, 7 хмельков, 9 корневых ириадов
-    // D = 13 × 4 × 24/20 + 7 × 6 × 26/20 + 9 × 6 × 26/20 = 62,4 + 54,6 + 70,2 = 187,2
-    // H = 13 × 11 × 23/20 + 7 × 18 × 25/20 + 9 × 45 × 31/20 = 164,45 + 157,5 + 627,75 = 949,7
+    // D = 13 × 4 × K(4) + 7 × 6 × K(6) + 9 × 6 × K(6) = 60,1952 + 51,828 + 66,636 = 178,6592
+    // H = 13 × 11 × K(3) + 7 × 18 × K(5) + 9 × 45 × K(11) = 159,9884 + 150,696 + 574,29 = 884,9744
     const before = indicesOf([
       { unit: faun, count: 13 },
       { unit: hoplet, count: 7 },
@@ -78,52 +82,78 @@ describe('индексы', () => {
     ])
 
     // Стало: 10 фавнов, 12 хмельков, 7 ириадов
-    // D = 48 + 93,6 + 54,6 = 196,2;  H = 126,5 + 270 + 488,25 = 884,75
+    // D = 46,304 + 88,848 + 51,828 = 186,98;  H = 123,068 + 258,336 + 446,67 = 828,074
     const after = indicesOf([
       { unit: faun, count: 10 },
       { unit: hoplet, count: 12 },
       { unit: vineIriyad, count: 7 },
     ])
 
-    expect(before.damage).toBeCloseTo(187.2, 9)
-    expect(before.hardiness).toBeCloseTo(949.7, 9)
-    expect(after.damage).toBeCloseTo(196.2, 9)
-    expect(after.hardiness).toBeCloseTo(884.75, 9)
+    expect(before.damage).toBeCloseTo(178.6592, 9)
+    expect(before.hardiness).toBeCloseTo(884.9744, 9)
+    expect(after.damage).toBeCloseTo(186.98, 9)
+    expect(after.hardiness).toBeCloseTo(828.074, 9)
 
-    // мощность: √177 783,84 ≈ 421,644 → √173 587,95 ≈ 416,639, то есть −1,19%
-    expect(before.power).toBeCloseTo(421.644, 3)
-    expect(after.power).toBeCloseTo(416.639, 3)
-    expect(1 - after.power / before.power).toBeCloseTo(0.0119, 4)
+    // мощность: ≈ 397,629 → ≈ 393,489, то есть −1,04%
+    expect(before.power).toBeCloseTo(397.629, 3)
+    expect(after.power).toBeCloseTo(393.489, 3)
+    expect(1 - after.power / before.power).toBeCloseTo(0.0104, 4)
   })
 
   test('одно существо — индексы на одну единицу: так их видит рейтинг', () => {
-    // фавн: D = 4 × 24/20 = 4,8;  H = 11 × 23/20 = 12,65;  мощность = √60,72 ≈ 7,792
+    // фавн: D = 4 × K(4) = 4,6304;  H = 11 × K(3) = 12,3068;  мощность ≈ 7,549
     const indices = indicesOf([{ unit: faun, count: 1 }])
 
-    expect(indices.damage).toBeCloseTo(4.8, 9)
-    expect(indices.hardiness).toBeCloseTo(12.65, 9)
-    expect(indices.power).toBeCloseTo(7.792, 3)
+    expect(indices.damage).toBeCloseTo(4.6304, 9)
+    expect(indices.hardiness).toBeCloseTo(12.3068, 9)
+    expect(indices.power).toBeCloseTo(7.549, 3)
   })
 
   test('бонус героя прибавляется к атаке и защите каждого существа', () => {
     // 10 мечников, герой +5 к атаке и +3 к защите:
-    // D = 10 × 2,5 × (20 + 4 + 5)/20 = 36,25;  H = 10 × 12 × (20 + 4 + 3)/20 = 162
-    // мощность = √(36,25 × 162) = √5872,5 ≈ 76,632
-    const indices = indicesOf([{ unit: swordsman, count: 10 }], { attack: 5, defense: 3 })
+    // D = 10 × 2,5 × K(4 + 5) = 33,64;  H = 10 × 12 × K(4 + 3) = 152,592;  мощность ≈ 71,646
+    const indices = indicesOf([{ unit: swordsman, count: 10 }], { hero: { attack: 5, defense: 3 } })
 
-    expect(indices.damage).toBeCloseTo(36.25, 9)
-    expect(indices.hardiness).toBeCloseTo(162, 9)
-    expect(indices.power).toBeCloseTo(76.632, 3)
+    expect(indices.damage).toBeCloseTo(33.64, 9)
+    expect(indices.hardiness).toBeCloseTo(152.592, 9)
+    expect(indices.power).toBeCloseTo(71.646, 3)
+  })
+
+  test('противник: урон — от разницы с его защитой, живучесть — от разницы с его атакой', () => {
+    // 10 мечников против атаки 8 и защиты 9:
+    // D = 25 / K(9 − 4) = 25 / 1,196 ≈ 20,903;  H = 120 / K(8 − 4) = 120 / 1,1576 ≈ 103,663
+    const indices = indicesOf([{ unit: swordsman, count: 10 }], {
+      opponent: { attack: 8, defense: 9 },
+    })
+
+    expect(indices.damage).toBeCloseTo(20.903, 3)
+    expect(indices.hardiness).toBeCloseTo(103.663, 3)
+  })
+
+  test('от противника зависит, кто бьёт сильнее', () => {
+    // Надзиратель Бездны: атака 40, урон 40–60; Королева роя: атака 30, урон 60.
+    // По цели без защиты: 50 × K(40) = 114,4 и 60 × K(30) = 121,56 — сильнее Королева.
+    // По защите 30: 50 × K(10) = 69,1 и 60 × K(0) = 60 — сильнее Надзиратель.
+    // По старой формуле они наносили поровну любой цели: 50 × 60 = 60 × 50
+    const overseer: ArmyUnit = { hp: 250, attack: 40, defense: 40, damageMin: 40, damageMax: 60 }
+    const queen: ArmyUnit = { hp: 200, attack: 30, defense: 30, damageMin: 60, damageMax: 60 }
+    const damage = (unit: ArmyUnit, defense: number) =>
+      indicesOf([{ unit, count: 1 }], { opponent: { attack: 0, defense } }).damage
+
+    expect(damage(overseer, 0)).toBeCloseTo(114.4, 9)
+    expect(damage(queen, 0)).toBeCloseTo(121.56, 9)
+    expect(damage(overseer, 30)).toBeCloseTo(69.1, 9)
+    expect(damage(queen, 30)).toBeCloseTo(60, 9)
   })
 
   test('вдвое больше тех же существ — вдвое больше мощности', () => {
-    // Ради этого мощность и берётся под корнем: 10 мечников — √(30 × 144) ≈ 65,727,
-    // 20 мечников — √(60 × 288) ≈ 131,453
+    // Ради этого мощность и берётся под корнем: 10 мечников — √(28,94 × 138,912) ≈ 63,404,
+    // 20 мечников — √(57,88 × 277,824) ≈ 126,809
     const ten = indicesOf([{ unit: swordsman, count: 10 }])
     const twenty = indicesOf([{ unit: swordsman, count: 20 }])
 
-    expect(ten.power).toBeCloseTo(65.727, 3)
-    expect(twenty.power).toBeCloseTo(131.453, 3)
+    expect(ten.power).toBeCloseTo(63.404, 3)
+    expect(twenty.power).toBeCloseTo(126.809, 3)
   })
 
   test('без отрядов — одни нули', () => {

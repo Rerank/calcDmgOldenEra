@@ -25,6 +25,7 @@ export function RatingScreen() {
           <br />
           <strong>{t.powerIndex}</strong>&nbsp;— {notes.power}
         </p>
+        <p>{notes.opponent}</p>
         <p>{notes.growth}</p>
       </AppHeader>
 

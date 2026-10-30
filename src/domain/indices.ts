@@ -1,5 +1,5 @@
-import { RULES } from './rules'
-import type { ArmyHero, ArmyStack, Indices } from './types'
+import { attackDefenseMultiplier } from './damage'
+import type { ArmyHero, ArmyStack, Indices, Opponent } from './types'
 
 /**
  * Индексы урона, живучести и мощности — общая математика сравнения армий
@@ -7,9 +7,16 @@ import type { ArmyHero, ArmyStack, Indices } from './types'
  * на выход числа.
  *
  * Армия сводится к двум индексам. Индекс урона — сколько она наносит за один
- * залп по цели с нулевой защитой, индекс живучести — сколько урона от удара
- * с нулевой атакой она выдержит. Настоящие защита цели и атака врага одинаковы
- * для всех сравниваемых и при сравнении сокращаются — знать их не нужно.
+ * залп по противнику, индекс живучести — сколько урона от ударов противника
+ * она выдержит. Множитель тот же, что в калькуляторе урона.
+ *
+ * До патча 0.82.06 противник был не важен: множитель (20 + ATK) / (20 + DEF)
+ * раскладывался на часть атакующего и часть цели, и при сравнении часть
+ * противника сокращалась. Новый множитель зависит от разницы атаки и защиты,
+ * а каждое очко разницы даёт меньше предыдущего, поэтому кто сильнее — теперь
+ * зависит от того, против кого сравнивать. Противника задаёт вызывающий:
+ * армии сравниваются с целью без атаки и защиты, рейтинг — со средним
+ * существом ранга.
  *
  * Рейтинг существ — то же сравнение в другом представлении: существо — это
  * армия из одного отряда. Поштучно — из одного существа, с приростом —
@@ -17,6 +24,14 @@ import type { ArmyHero, ArmyStack, Indices } from './types'
  */
 
 const NO_HERO: ArmyHero = { attack: 0, defense: 0 }
+
+/**
+ * Противник без атаки и защиты: урон по цели без защиты и живучесть
+ * под ударами без атаки. Им сравниваются армии — в смешанной армии отряды
+ * бьют противников всех рангов, и такой противник даёт почти то же, что
+ * бой армии с армией.
+ */
+export const NO_OPPONENT: Opponent = { attack: 0, defense: 0 }
 
 /**
  * Допуск при сравнении. Суммы по разным отрядам складываются в разном
@@ -27,16 +42,24 @@ const NO_HERO: ArmyHero = { attack: 0, defense: 0 }
  */
 export const EPSILON = 1e-9
 
-/** Индексы набора отрядов — армии или одного отряда. */
-export function indicesOf(stacks: ArmyStack[], hero: ArmyHero = NO_HERO): Indices {
+/** Индексы набора отрядов — армии или одного отряда — против противника. */
+export function indicesOf(
+  stacks: ArmyStack[],
+  { hero = NO_HERO, opponent = NO_OPPONENT }: { hero?: ArmyHero; opponent?: Opponent } = {},
+): Indices {
   let damage = 0
   let hardiness = 0
 
   for (const { unit, count } of stacks) {
     const avgDamage = (unit.damageMin + unit.damageMax) / 2
     // бонус героя прибавляется к атаке и защите каждого существа армии
-    damage += (count * avgDamage * (RULES.base + unit.attack + hero.attack)) / RULES.base
-    hardiness += (count * unit.hp * (RULES.base + unit.defense + hero.defense)) / RULES.base
+    const attack = unit.attack + hero.attack
+    const defense = unit.defense + hero.defense
+
+    // урон по противнику умножается на множитель от разницы атаки и его защиты,
+    // а здоровье делится на множитель его ударов — столько урона нужно нанести
+    damage += count * avgDamage * attackDefenseMultiplier(attack, opponent.defense)
+    hardiness += (count * unit.hp) / attackDefenseMultiplier(opponent.attack, defense)
   }
 
   // Произведение, а не сумма: армия А уничтожит армию Б за H(Б) / D(А) ходов,

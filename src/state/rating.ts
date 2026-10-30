@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CREATURE_TEMPLATES, FACTIONS, type CreatureTemplate, type FactionId } from '../data/creatures'
 import { factionSummary, rateUnits } from '../domain/rating'
-import type { Metric } from '../domain/types'
+import type { Metric, Opponent } from '../domain/types'
 import * as transitions from './ratingTransitions'
 import type { CreatureKind, SortKey } from './ratingTransitions'
 
@@ -37,6 +37,24 @@ export const RATING_FACTIONS = FACTIONS.filter((faction) =>
   RATED_CREATURES.some((creature) => creature.faction === faction.id),
 )
 
+const mean = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length
+
+/**
+ * Противник рейтинга — среднее существо ранга: средние атака и защита всех
+ * существ ранга в рейтинге. Фильтр «Существа» его не меняет: иначе индексы
+ * менялись бы вместе с тем, кого сравнивают. Средние дробные — так точнее.
+ */
+export const TIER_OPPONENTS: Record<number, Opponent> = Object.fromEntries(
+  RATING_TIERS.map((tier) => {
+    const group = RATED_CREATURES.filter((creature) => creature.tier === tier)
+    const opponent = {
+      attack: mean(group.map((creature) => creature.attack)),
+      defense: mean(group.map((creature) => creature.defense)),
+    }
+    return [tier, opponent]
+  }),
+)
+
 /** Выбор фильтра для расчёта: пустой — это «Все», то есть ограничения нет. */
 const selected = <T>(values: T[]) => (values.length > 0 ? values : undefined)
 
@@ -51,7 +69,8 @@ const selected = <T>(values: T[]) => (values.length > 0 ? values : undefined)
 export function useRating() {
   const [options, setOptions] = useState(transitions.DEFAULT_RATING)
   const creatures = ratingPool(options.kind)
-  const entries = rateUnits(creatures, options.metric, options.weekly)
+  // каждый ранг сравнивается со своим средним существом
+  const entries = rateUnits(creatures, options.metric, options.weekly, (tier) => TIER_OPPONENTS[tier])
 
   return {
     options,

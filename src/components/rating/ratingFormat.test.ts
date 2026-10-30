@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import type { FactionId } from '../../data/creatures'
+import { NO_OPPONENT } from '../../domain/indices'
 import { factionSummary, rateUnits } from '../../domain/rating'
 import type { SummaryFilter } from '../../domain/types'
 import type { RatedCreature } from '../../state/rating'
@@ -99,7 +100,8 @@ describe('пример под сводкой', () => {
 
   /** Пример для этих существ — по той же сводке, что увидел бы экран. */
   const exampleFor = (creatures: RatedCreature[], shown: SummaryFilter = {}) => {
-    const entries = rateUnits(creatures, 'damage', false)
+    // атака 0 против цели без защиты: индекс урона равен урону
+    const entries = rateUnits(creatures, 'damage', false, () => NO_OPPONENT)
     return summaryExample(creatures, entries, factionSummary(creatures, entries, shown))
   }
 

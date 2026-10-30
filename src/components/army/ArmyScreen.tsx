@@ -73,6 +73,7 @@ export function ArmyScreen() {
           <br />
           <strong>{t.powerIndex}</strong>&nbsp;— {notes.power}
         </p>
+        <p>{notes.multiplier}</p>
       </AppHeader>
 
       <main className="army-compare">

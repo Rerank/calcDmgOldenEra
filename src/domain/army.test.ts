@@ -13,8 +13,9 @@ const cavalry: ArmyUnit = { hp: 85, attack: 12, defense: 17, damageMin: 10, dama
 
 describe('итог армии', () => {
   test('численность — сумма отрядов, индексы — из общего расчёта', () => {
-    // армия I из макета: 20 мечников, 14 грифонов, 6 кавалеристов;
-    // D = 307,5, H = 1777,5, мощность ≈ 739,311 — расписано в indices.test.ts
+    // армия I из макета: 20 мечников, 14 грифонов, 6 кавалеристов; против цели
+    // без атаки и защиты D = 287,156, H = 1625,16, мощность ≈ 683,136 — расписано
+    // в indices.test.ts
     const stats = armyStats([
       { unit: swordsman, count: 20 },
       { unit: griffin, count: 14 },
@@ -22,17 +23,17 @@ describe('итог армии', () => {
     ])
 
     expect(stats.count).toBe(40)
-    expect(stats.damage).toBeCloseTo(307.5, 9)
-    expect(stats.hardiness).toBeCloseTo(1777.5, 9)
-    expect(stats.power).toBeCloseTo(739.311, 3)
+    expect(stats.damage).toBeCloseTo(287.156, 9)
+    expect(stats.hardiness).toBeCloseTo(1625.16, 9)
+    expect(stats.power).toBeCloseTo(683.136, 3)
   })
 
   test('бонус героя доходит до расчёта', () => {
-    // 10 мечников, герой +5 / +3: D = 36,25, H = 162
+    // 10 мечников, герой +5 / +3: D = 33,64, H = 152,592
     const stats = armyStats([{ unit: swordsman, count: 10 }], { attack: 5, defense: 3 })
 
-    expect(stats.damage).toBeCloseTo(36.25, 9)
-    expect(stats.hardiness).toBeCloseTo(162, 9)
+    expect(stats.damage).toBeCloseTo(33.64, 9)
+    expect(stats.hardiness).toBeCloseTo(152.592, 9)
   })
 
   test('пустая армия — одни нули', () => {

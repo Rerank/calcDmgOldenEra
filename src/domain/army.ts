@@ -16,10 +16,13 @@ import type {
  * Индексы считает indices.ts — та же математика, что у рейтинга существ.
  */
 
-/** Итог армии: индексы и численность — по ней видно, что армия пустая. */
+/**
+ * Итог армии: индексы и численность — по ней видно, что армия пустая.
+ * Противник — цель без атаки и защиты (NO_OPPONENT, по умолчанию в indicesOf).
+ */
 export function armyStats(stacks: ArmyStack[], hero?: ArmyHero): ArmyStats {
   const count = stacks.reduce((sum, stack) => sum + stack.count, 0)
-  return { count, ...indicesOf(stacks, hero) }
+  return { count, ...indicesOf(stacks, { hero }) }
 }
 
 /** Место в колонке. Пустая армия ни с кем не соревнуется — в таблице у неё прочерк. */

@@ -1,6 +1,7 @@
 import { indicesOf, nearlyEqual, placeAmong, shareOf } from './indices'
 import type {
   Metric,
+  Opponent,
   RatedUnit,
   RatingEntry,
   RatingSummary,
@@ -16,12 +17,16 @@ import type {
  * по фракциям.
  *
  * Существа сравниваются только внутри своего ранга: дракон и мечник
- * в одном списке ничего бы друг о друге не сказали.
+ * в одном списке ничего бы друг о друге не сказали. Противник у ранга свой —
+ * его задаёт вызывающий: обычно это среднее существо того же ранга.
  */
 
+/** Противник для существ ранга. */
+export type OpponentOf = (tier: number) => Opponent
+
 /** Индекс существа: одного или недельного отряда. */
-const valueOf = (unit: RatedUnit, metric: Metric, weekly: boolean) =>
-  indicesOf([{ unit, count: weekly ? unit.growth : 1 }])[metric]
+const valueOf = (unit: RatedUnit, metric: Metric, weekly: boolean, opponent: Opponent) =>
+  indicesOf([{ unit, count: weekly ? unit.growth : 1 }], { opponent })[metric]
 
 /**
  * Места и доли от лидера — среди существ своего ранга. Результат — в том же
@@ -30,9 +35,16 @@ const valueOf = (unit: RatedUnit, metric: Metric, weekly: boolean) =>
  * Место поштучно считается всегда: с приростом по нему видно, насколько
  * существо поднялось или опустилось.
  */
-export function rateUnits(units: RatedUnit[], metric: Metric, weekly: boolean): RatingEntry[] {
-  const values = units.map((unit) => valueOf(unit, metric, weekly))
-  const solo = weekly ? units.map((unit) => valueOf(unit, metric, false)) : values
+export function rateUnits(
+  units: RatedUnit[],
+  metric: Metric,
+  weekly: boolean,
+  opponentOf: OpponentOf,
+): RatingEntry[] {
+  const value = (unit: RatedUnit, forWeek: boolean) =>
+    valueOf(unit, metric, forWeek, opponentOf(unit.tier))
+  const values = units.map((unit) => value(unit, weekly))
+  const solo = weekly ? units.map((unit) => value(unit, false)) : values
 
   // значения соседей по рангу — с ними и сравнивается существо
   const rivals = (list: number[], tier: number) => list.filter((_, i) => units[i].tier === tier)
