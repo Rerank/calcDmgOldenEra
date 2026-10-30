@@ -4,7 +4,8 @@ import powerIcon from '../../assets/images/power.webp'
 import { FACTIONS } from '../../data/creatures'
 import type { Metric, RatingEntry, RatingSummary } from '../../domain/types'
 import { fill, lang, t } from '../../i18n'
-import type { RatedCreature } from '../../state/rating'
+import { TIER_OPPONENTS, type RatedCreature } from '../../state/rating'
+import type { OpponentChoice } from '../../state/ratingTransitions'
 import { ROMAN } from '../roman'
 
 /**
@@ -69,6 +70,22 @@ export const factionName = (id: string) =>
 
 /** «Ранг III» — строка над блоком ранга. */
 export const tierName = (tier: number) => `${t.tier} ${ROMAN[tier - 1]}`
+
+/**
+ * Против кого посчитан рейтинг — фраза примечания под таблицей. У выбранного
+ * ранга видны средние атака и защита: от них и считаются индексы. У своего
+ * ранга противник в каждом блоке другой, поэтому без чисел.
+ */
+export function opponentNote(choice: OpponentChoice) {
+  if (choice === 'own') return t.ratingNoteOpponent.own
+
+  const { attack, defense } = TIER_OPPONENTS[choice]
+  return fill(t.ratingNoteOpponent.tier, {
+    tier: ROMAN[choice - 1],
+    attack: ONE_DIGIT.format(attack),
+    defense: ONE_DIGIT.format(defense),
+  })
+}
 
 /**
  * Насколько сдвинулось место с приростом относительно места поштучно:

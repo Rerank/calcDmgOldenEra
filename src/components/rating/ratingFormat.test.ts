@@ -10,6 +10,7 @@ import {
   formatIndex,
   formatShare,
   metaLine,
+  opponentNote,
   placeShift,
   summaryExample,
   tierName,
@@ -231,5 +232,15 @@ describe('пример под сводкой', () => {
 
   test('пустая сводка — примера нет', () => {
     expect(exampleFor([])).toBeNull()
+  })
+})
+
+describe('противник в примечании', () => {
+  test('свой ранг — без чисел: противник в каждом ранге другой', () => {
+    expect(opponentNote('own')).toBe('Противник — среднее существо своего ранга.')
+  })
+
+  test('выбранный ранг — римской цифрой, средние атака и защита с одним знаком', () => {
+    expect(opponentNote(7)).toMatch(/^Противник — среднее существо VII ранга: атака \d+,\d, защита \d+,\d\.$/)
   })
 })

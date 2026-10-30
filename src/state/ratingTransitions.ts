@@ -38,11 +38,19 @@ export type CreatureKind = 'all' | 'base' | 'upgraded'
 /** Вид существ в порядке кнопок фильтра. */
 export const CREATURE_KINDS: CreatureKind[] = ['all', 'base', 'upgraded']
 
+/**
+ * Против кого считаются индексы: среднее существо своего ранга ('own')
+ * или выбранного — тогда у всех рангов противник один.
+ */
+export type OpponentChoice = 'own' | number
+
 export interface RatingOptions {
   /** категория: урон, живучесть или мощность */
   metric: Metric
   /** кто соревнуется: в отличие от ранга и фракции, меняет места и доли */
   kind: CreatureKind
+  /** противник: как и вид существ, меняет индексы, места и доли */
+  opponent: OpponentChoice
   /** выбранные ранги; пусто — «Все» */
   tiers: number[]
   /** выбранные фракции; пусто — «Все» */
@@ -64,10 +72,14 @@ const WEEKLY_ONLY: SortKey[] = ['growth', 'solo']
 
 const DEFAULT_SORT: RatingSort = { key: 'value', dir: 'desc' }
 
-/** Экран открывается на уроне поштучно, все существа, ранги и фракции, по индексу ▼. */
+/**
+ * Экран открывается на уроне поштучно, все существа, ранги и фракции,
+ * противник своего ранга, по индексу ▼.
+ */
 export const DEFAULT_RATING: RatingOptions = {
   metric: 'damage',
   kind: 'all',
+  opponent: 'own',
   tiers: [],
   factions: [],
   weekly: false,
@@ -81,6 +93,11 @@ export function setMetric(options: RatingOptions, metric: Metric): RatingOptions
 /** Выбор ровно один: «Все», «Базовые» или «Улучшенные». */
 export function setKind(options: RatingOptions, kind: CreatureKind): RatingOptions {
   return options.kind === kind ? options : { ...options, kind }
+}
+
+/** Выбор ровно один: свой ранг или один из рангов. */
+export function setOpponent(options: RatingOptions, opponent: OpponentChoice): RatingOptions {
+  return options.opponent === opponent ? options : { ...options, opponent }
 }
 
 /** Значение включается или выключается. Снятое последним — пустой выбор, то есть снова «Все». */

@@ -3,7 +3,7 @@ import { CREATURE_TEMPLATES, FACTIONS, type CreatureTemplate, type FactionId } f
 import { factionSummary, rateUnits } from '../domain/rating'
 import type { Metric, Opponent } from '../domain/types'
 import * as transitions from './ratingTransitions'
-import type { CreatureKind, SortKey } from './ratingTransitions'
+import type { CreatureKind, OpponentChoice, SortKey } from './ratingTransitions'
 
 /** Существо рейтинга — шаблон справочника, у которого есть прирост. */
 export type RatedCreature = CreatureTemplate & { growth: number }
@@ -55,6 +55,10 @@ export const TIER_OPPONENTS: Record<number, Opponent> = Object.fromEntries(
   }),
 )
 
+/** Противник для существ ранга: среднее существо своего ранга или выбранного. */
+export const opponentFor = (choice: OpponentChoice) => (tier: number) =>
+  TIER_OPPONENTS[choice === 'own' ? tier : choice]
+
 /** Выбор фильтра для расчёта: пустой — это «Все», то есть ограничения нет. */
 const selected = <T>(values: T[]) => (values.length > 0 ? values : undefined)
 
@@ -69,8 +73,7 @@ const selected = <T>(values: T[]) => (values.length > 0 ? values : undefined)
 export function useRating() {
   const [options, setOptions] = useState(transitions.DEFAULT_RATING)
   const creatures = ratingPool(options.kind)
-  // каждый ранг сравнивается со своим средним существом
-  const entries = rateUnits(creatures, options.metric, options.weekly, (tier) => TIER_OPPONENTS[tier])
+  const entries = rateUnits(creatures, options.metric, options.weekly, opponentFor(options.opponent))
 
   return {
     options,
@@ -89,6 +92,8 @@ export function useRating() {
 
     setMetric: (metric: Metric) => setOptions((current) => transitions.setMetric(current, metric)),
     setKind: (kind: CreatureKind) => setOptions((current) => transitions.setKind(current, kind)),
+    setOpponent: (opponent: OpponentChoice) =>
+      setOptions((current) => transitions.setOpponent(current, opponent)),
     toggleTier: (tier: number) => setOptions((current) => transitions.toggleTier(current, tier)),
     allTiers: () => setOptions(transitions.allTiers),
     toggleFaction: (faction: FactionId) =>

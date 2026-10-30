@@ -5,6 +5,7 @@ import {
   DEFAULT_RATING,
   setKind,
   setMetric,
+  setOpponent,
   setWeekly,
   sortBy,
   toggleFaction,
@@ -15,10 +16,11 @@ import {
 const options = (patch: Partial<RatingOptions> = {}): RatingOptions => ({ ...DEFAULT_RATING, ...patch })
 
 describe('категория', () => {
-  test('по умолчанию — урон поштучно, все существа, ранги и фракции, по индексу ▼', () => {
+  test('по умолчанию — урон поштучно, все существа, ранги и фракции, свой ранг, по индексу ▼', () => {
     expect(DEFAULT_RATING).toEqual({
       metric: 'damage',
       kind: 'all',
+      opponent: 'own',
       tiers: [],
       factions: [],
       weekly: false,
@@ -46,6 +48,28 @@ describe('вид существ: выбор ровно один', () => {
   test('вид не трогает ни фильтров, ни сортировки', () => {
     const start = options({ tiers: [2], factions: ['hive'], sort: { key: 'name', dir: 'asc' } })
     const next = setKind(start, 'upgraded')
+
+    expect(next.tiers).toBe(start.tiers)
+    expect(next.factions).toBe(start.factions)
+    expect(next.sort).toBe(start.sort)
+  })
+})
+
+describe('противник: выбор ровно один', () => {
+  test('выбранный ранг меняется, вернуться можно к своему, повторный выбор — тот же объект', () => {
+    const start = options()
+    const seventh = setOpponent(start, 7)
+
+    expect(seventh.opponent).toBe(7)
+    expect(setOpponent(seventh, 1).opponent).toBe(1)
+    expect(setOpponent(seventh, 'own').opponent).toBe('own')
+    expect(setOpponent(start, 'own')).toBe(start)
+    expect(setOpponent(seventh, 7)).toBe(seventh)
+  })
+
+  test('противник не трогает ни фильтров, ни сортировки', () => {
+    const start = options({ tiers: [2], factions: ['hive'], sort: { key: 'name', dir: 'asc' } })
+    const next = setOpponent(start, 3)
 
     expect(next.tiers).toBe(start.tiers)
     expect(next.factions).toBe(start.factions)

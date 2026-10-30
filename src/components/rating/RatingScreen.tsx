@@ -39,11 +39,13 @@ export function RatingScreen() {
           onToggleFaction={rating.toggleFaction}
           onAllFactions={rating.allFactions}
           onKindChange={rating.setKind}
+          onOpponentChange={rating.setOpponent}
           onWeeklyChange={rating.setWeekly}
         />
         <RatingPanel
           metric={options.metric}
           kind={options.kind}
+          opponent={options.opponent}
           weekly={options.weekly}
           groups={ratingGroups(rating.creatures, rating.entries, options)}
           sort={options.sort}

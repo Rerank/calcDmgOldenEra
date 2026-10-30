@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'vitest'
-import { RATED_CREATURES, RATING_FACTIONS, RATING_TIERS, ratingPool } from './rating'
+import {
+  opponentFor,
+  RATED_CREATURES,
+  RATING_FACTIONS,
+  RATING_TIERS,
+  ratingPool,
+  TIER_OPPONENTS,
+} from './rating'
 
 describe('кто в рейтинге', () => {
   test('только существа, которых нанимают в городе: нет нейтралов и Огненной личинки', () => {
@@ -44,5 +51,24 @@ describe('вид существ', () => {
     expect(ids('base')).toContain('swordsman')
     expect(ids('base')).not.toContain('guardcaptain')
     expect(ids('upgraded')).toContain('guardcaptain')
+  })
+})
+
+describe('противник', () => {
+  test('среднее существо ранга — по всем существам ранга, базовым и улучшенным', () => {
+    for (const tier of RATING_TIERS) {
+      const group = RATED_CREATURES.filter((creature) => creature.tier === tier)
+      const sum = (key: 'attack' | 'defense') => group.reduce((total, c) => total + c[key], 0)
+
+      expect(TIER_OPPONENTS[tier].attack).toBeCloseTo(sum('attack') / group.length, 9)
+      expect(TIER_OPPONENTS[tier].defense).toBeCloseTo(sum('defense') / group.length, 9)
+    }
+  })
+
+  test('свой ранг — у каждого ранга свой противник, выбранный — один на все', () => {
+    expect(opponentFor('own')(2)).toBe(TIER_OPPONENTS[2])
+    expect(opponentFor('own')(6)).toBe(TIER_OPPONENTS[6])
+    expect(opponentFor(7)(1)).toBe(TIER_OPPONENTS[7])
+    expect(opponentFor(7)(7)).toBe(TIER_OPPONENTS[7])
   })
 })

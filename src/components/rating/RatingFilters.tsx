@@ -5,6 +5,7 @@ import { RATING_FACTIONS, RATING_TIERS } from '../../state/rating'
 import {
   CREATURE_KINDS,
   type CreatureKind,
+  type OpponentChoice,
   type RatingOptions,
 } from '../../state/ratingTransitions'
 import { ROMAN } from '../roman'
@@ -22,10 +23,15 @@ type Props = {
   onToggleFaction: (faction: FactionId) => void
   onAllFactions: () => void
   onKindChange: (kind: CreatureKind) => void
+  onOpponentChange: (opponent: OpponentChoice) => void
   onWeeklyChange: (weekly: boolean) => void
 }
 
 const TIER_OPTIONS = RATING_TIERS.map((tier) => ({ value: tier, label: ROMAN[tier - 1] }))
+const OPPONENT_OPTIONS: Array<{ value: OpponentChoice; label: string }> = [
+  { value: 'own', label: t.opponentOwn },
+  ...TIER_OPTIONS,
+]
 const FACTION_OPTIONS = RATING_FACTIONS.map((faction) => ({
   value: faction.id,
   label: faction.name[lang],
@@ -33,10 +39,10 @@ const FACTION_OPTIONS = RATING_FACTIONS.map((faction) => ({
 
 /**
  * Фильтры — вторичные параметры: какие ранги и фракции показать, каких
- * существ сравнивать и считать ли прирост. Ранг и фракция только прячут
- * строки — места и доли от лидера по-прежнему считаются среди всех существ
- * ранга. Вид существ решает, кто соревнуется: невыбранных для рейтинга
- * будто нет.
+ * существ сравнивать, против кого и считать ли прирост. Ранг и фракция
+ * только прячут строки — места и доли от лидера по-прежнему считаются среди
+ * всех существ ранга. Вид существ решает, кто соревнуется: невыбранных для
+ * рейтинга будто нет. Противник меняет сами индексы.
  */
 export function RatingFilters({
   options,
@@ -45,6 +51,7 @@ export function RatingFilters({
   onToggleFaction,
   onAllFactions,
   onKindChange,
+  onOpponentChange,
   onWeeklyChange,
 }: Props) {
   return (
@@ -71,6 +78,19 @@ export function RatingFilters({
         {CREATURE_KINDS.map((kind) => (
           <Chip key={kind} pressed={options.kind === kind} onClick={() => onKindChange(kind)}>
             {t.kinds[kind]}
+          </Chip>
+        ))}
+      </FilterRow>
+
+      {/* тоже выбор ровно один: свой ранг или один из рангов */}
+      <FilterRow id="rating-opponent-label" label={t.opponent}>
+        {OPPONENT_OPTIONS.map((option) => (
+          <Chip
+            key={option.value}
+            pressed={options.opponent === option.value}
+            onClick={() => onOpponentChange(option.value)}
+          >
+            {option.label}
           </Chip>
         ))}
       </FilterRow>
