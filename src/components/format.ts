@@ -1,10 +1,16 @@
 import { CUSTOM_TEMPLATE_ID, findTemplate } from '../data/creatures'
-import { RULES } from '../domain/rules'
+import { attackDefenseMultiplier } from '../domain/damage'
 import type { Side, Strike } from '../domain/types'
 import { lang, t } from '../i18n'
 
 /** «7–9», но «7», если min и max совпали. */
 const range = (min: number, max: number) => (min === max ? `${min}` : `${min}–${max}`)
+
+/** Множитель атаки/защиты в расшифровке: «1,04» — два знака, разделитель языка. */
+const multiplierFormat = new Intl.NumberFormat(lang, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 
 const templateName = (id: string) =>
   id === CUSTOM_TEMPLATE_ID
@@ -13,16 +19,18 @@ const templateName = (id: string) =>
 
 /**
  * Строка под таблицей результата: из чего сложился этот урон.
- * «10 шт × 7–9 урона × (20 + 14) / (20 + 13) · увел. исх. 25% · умен. вх. 10%»
+ * «10 шт × 7–9 урона × 1,04 (14 − 13) · увел. исх. 25% · умен. вх. 10%»
  *
- * Атака и защита здесь уже с героями. У ответного удара количество бьющих —
- * диапазон: отвечают выжившие, а их число зависит от силы первого удара.
+ * Множитель атаки/защиты — числом, а в скобках — атака и защита, из разницы
+ * которых он получился. Они здесь уже с героями. У ответного удара количество
+ * бьющих — диапазон: отвечают выжившие, а их число зависит от силы первого удара.
  */
 export function formatBreakdown(strike: Strike, striker: Side, receiver: Side): string {
+  const multiplier = attackDefenseMultiplier(strike.attack, strike.defense)
   const parts = [
     `${range(strike.countMin, strike.countMax)} ${t.pcs}` +
       ` × ${range(striker.damageMin, striker.damageMax)} ${t.damageGenitive}` +
-      ` × (${RULES.base} + ${strike.attack}) / (${RULES.base} + ${strike.defense})`,
+      ` × ${multiplierFormat.format(multiplier)} (${strike.attack} − ${strike.defense})`,
   ]
 
   // нулевые проценты на урон не влияют — в строке от них только шум

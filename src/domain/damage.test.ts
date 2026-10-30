@@ -44,17 +44,18 @@ const input = (
 
 describe('удар по защищающемуся', () => {
   test('базовая формула, округление к ближайшему и точное деление на здоровье', () => {
-    // 10 шт × 7–9 урона × (20 + 10) / (20 + 8) = 75 / 96.43 / 85.71
+    // Разница 13 − 8 = 5 очков: 4 + 3,96 + 3,92 + 3,88 + 3,84 = 19,6%, множитель 1,196.
+    // 10 шт × 7–9 урона × 1,196 = 83,72 / 107,64 / 95,68
     const { strike } = calculate(
-      input({ count: 10, damageMin: 7, damageMax: 9, attack: 10 }, { defense: 8, hp: 25, count: 8 }),
+      input({ count: 10, damageMin: 7, damageMax: 9, attack: 13 }, { defense: 8, hp: 28, count: 8 }),
     )
 
-    expect(strike.min.damage).toBe(75)
-    expect(strike.max.damage).toBe(96)
-    expect(strike.avg.damage).toBe(86)
+    expect(strike.min.damage).toBe(84)
+    expect(strike.max.damage).toBe(108)
+    expect(strike.avg.damage).toBe(96)
 
-    // 75 делится на 25 нацело: трое погибли, верхний выживший невредим
-    expect(strike.min).toMatchObject({ killed: 3, survived: 5, topHp: 25 })
+    // 84 делится на 28 нацело: трое погибли, верхний выживший невредим
+    expect(strike.min).toMatchObject({ killed: 3, survived: 5, topHp: 28 })
     expect(strike.max).toMatchObject({ killed: 3, survived: 5, topHp: 4 })
   })
 
@@ -81,15 +82,12 @@ describe('удар по защищающемуся', () => {
   })
 
   test('после всех штрафов остаётся минимум 10% урона', () => {
-    // 10 шт × 7 урона × 30/28 = 75, «умен. вх. 100%» срезает не до нуля, а до 10%
+    // 10 шт × 7 урона = 70, «умен. вх. 100%» срезает не до нуля, а до 10%
     const { strike } = calculate(
-      input(
-        { count: 10, damageMin: 7, damageMax: 7, attack: 10 },
-        { defense: 8, incoming: 100, hp: 1000 },
-      ),
+      input({ count: 10, damageMin: 7, damageMax: 7 }, { incoming: 100, hp: 1000 }),
     )
 
-    expect(strike.min.damage).toBe(8) // 7.5 округляется к ближайшему
+    expect(strike.min.damage).toBe(7)
   })
 
   test('финальный урон не меньше единицы при любой защите', () => {
@@ -99,30 +97,32 @@ describe('удар по защищающемуся', () => {
   })
 
   test('погрешность дробных чисел не уводит ровную половину вниз', () => {
-    // 5 шт × 3 урона × 20/21 × 75% × 70% — это ровно 7.5, но в double 7.499999999999998.
-    // Без EPSILON в damageOf округление дало бы 7: тест охраняет именно эту поправку
+    // 5 шт × 4 урона × 75% × 70% — это ровно 10.5, но в double 10.499999999999998.
+    // Без EPSILON в damageOf округление дало бы 10: тест охраняет именно эту поправку
     // и упадёт, если её убрать.
     //
     // Опасная граница зависит от способа округления. При округлении вниз ею были ровные
     // целые (60 → 59.999… → 59), при округлении к ближайшему — ровные половины.
     //
-    // Ожидание 8 заодно фиксирует предположение, что половина округляется вверх:
+    // Ожидание 11 заодно фиксирует предположение, что половина округляется вверх:
     // с игрой это пока не сверено.
     const { strike } = calculate(
       input(
-        { count: 5, damageMin: 3, damageMax: 3 },
-        { defense: 1, incoming: 25, hp: 1000 },
+        { count: 5, damageMin: 4, damageMax: 4 },
+        { incoming: 25, hp: 1000 },
         { ranged: true, rangePenalty: 30 },
       ),
     )
 
-    expect(strike.min.damage).toBe(8)
+    expect(strike.min.damage).toBe(11)
     expect(strike.penalty).toBe(30)
   })
 
-  test('сверено с игрой: 4 шт × 5–9 урона против защиты 5', () => {
-    // 23.2 и 41.76 — игра показывает 23 и 42, то есть округляет к ближайшему,
-    // а не вниз. Наблюдение из реального боя, в гайде правила округления нет.
+  test('округление к ближайшему: 4 шт × 5–9 урона против защиты 5', () => {
+    // Разница 9 − 5 = 4 очка: множитель 1,1576, урон 23,15 и 41,67 — это 23 и 42.
+    // При округлении вниз вышло бы 41. До патча 0.82.06 тот же удар сверили
+    // с игрой: по старой формуле 23,2 и 41,76, игра показала 23 и 42. По новой
+    // формуле с игрой ещё не сверено.
     const { strike } = calculate(
       input(
         { count: 4, damageMin: 5, damageMax: 9, attack: 9, defense: 7, hp: 30 },
@@ -132,6 +132,58 @@ describe('удар по защищающемуся', () => {
 
     expect(strike.min.damage).toBe(23)
     expect(strike.max.damage).toBe(42)
+  })
+})
+
+describe('множитель от разницы атаки и защиты', () => {
+  // 10 шт × 10 урона без модификаторов = 100, урон умножается только на множитель
+  const hit = (attacker: Partial<Side>, defender: Partial<Side>) =>
+    calculate(input({ count: 10, damageMin: 10, damageMax: 10, ...attacker }, { hp: 1000, ...defender }))
+      .strike.min.damage
+
+  test('пример разработчиков: 1000 троглодитов бьют чревеней', () => {
+    // Атака 2 против защиты 20, разница 18: 4 + 3,96 + … + 3,32 = 65,88%.
+    // 1000 шт × 2 урона / 1,6588 = 1205,7 — в посте патча 1206
+    const { strike } = calculate(
+      input({ count: 1000, damageMin: 1, damageMax: 3, attack: 2 }, { defense: 20, hp: 120, count: 100 }),
+    )
+
+    expect(strike.avg.damage).toBe(1206)
+  })
+
+  test('пример разработчиков: 75 чревеней бьют троглодитов', () => {
+    // Атака 20 против защиты 3, разница 17: 62,56%.
+    // 75 шт × 22,5 урона × 1,6256 = 2743,2 — в посте патча 2743
+    const { strike } = calculate(
+      input({ count: 75, damageMin: 22, damageMax: 23, attack: 20 }, { defense: 3, hp: 9, count: 1000 }),
+    )
+
+    expect(strike.avg.damage).toBe(2743)
+  })
+
+  test('равные атака и защита урон не меняют, сколько бы их ни было', () => {
+    expect(hit({ attack: 30 }, { defense: 30 })).toBe(100)
+    expect(hit({ attack: 0 }, { defense: 0 })).toBe(100)
+  })
+
+  test('одинаковые бонусы героев друг друга гасят', () => {
+    // 12 против 8 — разница 4: 100 × 1,1576 = 115,76. С героями +40 и +40 разница та же
+    expect(hit({ attack: 12 }, { defense: 8 })).toBe(116)
+    expect(hit({ attack: 12, heroAttack: 40 }, { defense: 8, heroDefense: 40 })).toBe(116)
+  })
+
+  test('защита выше атаки — урон делится на тот же множитель', () => {
+    // Разница 10: 4 + 3,96 + … + 3,64 = 38,2%. 100 × 1,382 = 138,2 и 100 / 1,382 = 72,36
+    expect(hit({ attack: 20 }, { defense: 10 })).toBe(138)
+    expect(hit({ attack: 10 }, { defense: 20 })).toBe(72)
+  })
+
+  test('после разницы 100 множитель не растёт', () => {
+    // Сотня очков — 202%: 100 × 3,02 = 302 и 100 / 3,02 = 33,1
+    expect(hit({ attack: 100 }, {})).toBe(302)
+    expect(hit({ attack: 150 }, {})).toBe(302)
+    expect(hit({}, { defense: 100 })).toBe(33)
+    expect(hit({}, { defense: 150 })).toBe(33)
   })
 })
 
@@ -242,16 +294,18 @@ describe('ответный удар', () => {
   )
 
   test('отвечают выжившие, а ветки перекрёстные', () => {
-    // Удар: 53 / 128 / 91 урона → выжило 6 / 3 / 5 защищающихся
+    // Удар: разница 10 − 8 = 2, множитель 1,0796.
+    // 54 / 130 / 92 урона → выжило 6 / 3 / 5 защищающихся
     expect(battle.strike.min.survived).toBe(6)
     expect(battle.strike.max.survived).toBe(3)
     expect(battle.strike.avg.survived).toBe(5)
 
+    // Ответ: разница 8 − 12 = −4, урон делится на 1,1576.
     // Минимум входящего — от самого сильного удара: выжило трое, бьют по минимуму.
     // Максимум — от самого слабого: выжило шестеро, бьют по максимуму.
-    expect(battle.counter?.min.damage).toBe(8) // 3 шт × 3 урона × 28/32 = 7.875
-    expect(battle.counter?.max.damage).toBe(32) // 6 шт × 6 урона × 28/32 = 31.5
-    expect(battle.counter?.avg.damage).toBe(20) // 5 шт × 4.5 урона × 28/32 = 19.6875
+    expect(battle.counter?.min.damage).toBe(8) // 3 шт × 3 урона / 1,1576 = 7,77
+    expect(battle.counter?.max.damage).toBe(31) // 6 шт × 6 урона / 1,1576 = 31,10
+    expect(battle.counter?.avg.damage).toBe(19) // 5 шт × 4,5 урона / 1,1576 = 19,44
   })
 
   test('в расшифровке количество отвечающих — диапазон', () => {

@@ -34,6 +34,9 @@ export function CalculatorScreen() {
     <>
       <AppHeader title={t.calculatorTitle} lead={<Formula />}>
         <p>
+          <strong>K</strong>&nbsp;— {notes.multiplier}
+        </p>
+        <p>
           <strong>{t.outgoing}</strong>&nbsp;— {notes.outgoing}
           <br />
           <strong>{t.incoming}</strong>&nbsp;— {notes.incoming}
@@ -95,7 +98,7 @@ export function CalculatorScreen() {
 /**
  * Формула урона в шапке. Делится на слагаемые по « × », каждое не разрывается:
  * на узком экране строка переносится только перед знаком умножения, а скобки
- * вроде «(20 + ATK)» остаются целыми.
+ * вроде «K(ATK − DEF)» остаются целыми.
  */
 function Formula() {
   const terms = t.headerFormula.split(' × ')
