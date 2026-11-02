@@ -564,7 +564,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     tier: 4,
     growth: 4,
     upgraded: true,
-    hp: 50, attack: 20, defense: 12, damageMin: 12, damageMax: 15,
+    hp: 50, attack: 16, defense: 12, damageMin: 12, damageMax: 15,
     ranged: true,
     counterHalved: true,
   },
@@ -658,7 +658,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     tier: 7,
     growth: 1,
     upgraded: true,
-    hp: 250, attack: 30, defense: 34, damageMin: 45, damageMax: 65,
+    hp: 250, attack: 31, defense: 34, damageMin: 45, damageMax: 65,
   },
 
   // Рой
@@ -766,7 +766,7 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     tier: 4,
     growth: 5,
     upgraded: true,
-    hp: 45, attack: 13, defense: 15, damageMin: 10, damageMax: 14,
+    hp: 50, attack: 13, defense: 15, damageMin: 10, damageMax: 14,
   },
   {
     id: 'spelaeanscorpion',
