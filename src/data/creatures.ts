@@ -1,7 +1,7 @@
 /**
  * Справочник существ Olden Era — разовая выгрузка из таблицы. Характеристики
- * и прирост обновлены по списку изменений патча 0.82.06; новых нейтралов
- * этого патча — Мумии и Кицунэ — пока нет: их характеристики не опубликованы.
+ * и прирост обновлены по списку изменений патча 0.82.06, новые нейтралы
+ * этого патча — Мумия и Кицунэ — добавлены по их карточкам в игре.
  *
  * Здесь то, что влияет на урон, — параметры и два флага, — недельный
  * прирост и признак улучшения. Стоимость, инициатива, скорость, боевой дух
@@ -1352,6 +1352,13 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     hp: 95, attack: 16, defense: 22, damageMin: 18, damageMax: 18,
   },
   {
+    id: 'mummy',
+    name: { ru: 'Мумия', en: 'Mummy' },
+    faction: 'neutral',
+    tier: 5,
+    hp: 80, attack: 12, defense: 16, damageMin: 15, damageMax: 20,
+  },
+  {
     id: 'worldwatcher',
     name: { ru: 'Наблюдатель', en: 'Worldwatcher' },
     faction: 'neutral',
@@ -1394,6 +1401,13 @@ export const CREATURE_TEMPLATES: CreatureTemplate[] = [
     faction: 'neutral',
     tier: 7,
     hp: 325, attack: 33, defense: 32, damageMin: 60, damageMax: 70,
+  },
+  {
+    id: 'kitsune',
+    name: { ru: 'Кицунэ', en: 'Kitsune' },
+    faction: 'neutral',
+    tier: 7,
+    hp: 275, attack: 45, defense: 50, damageMin: 45, damageMax: 60,
   },
   {
     id: 'avatar',
